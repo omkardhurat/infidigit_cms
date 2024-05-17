@@ -26,3 +26,21 @@ a {
   background-image: url(../images/bg1.png);
   background-repeat: no-repeat;
 }
+
+.create-form{
+  padding: 20px;
+  display: flex;
+  justify-content: center;
+  flex-direction: column;
+  
+}
+
+.form-panel{
+  width: 50%;
+}
+
+@media only screen and (max-width: 600px) {
+  .form-panel{
+    width: 100%;
+  }
+}

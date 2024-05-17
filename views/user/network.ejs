@@ -1,0 +1,55 @@
+
+<%- include('../dashboard/sidemenu.ejs') %>
+
+
+<section class="home-section">
+  <div class="home-content">
+    <i class='bx bx-menu' ></i>
+    <span class="text">Network</span>
+  </div>
+  <div class="create-form">
+    <h4>Create Network</h4>
+    <br>
+    <form>
+      <div class="form-group form-panel">
+        <label for="stateSelect">State</label>
+        <select class="form-control" id="stateSelect">
+          <option>Maharashtra</option>
+          <option>Karnataka</option>
+          <option>Telangana</option>
+        </select>
+      </div>
+
+      <div class="form-group form-panel">
+        <label for="citySelect">City</label>
+        <select class="form-control" id="citySelect">
+          <option>Mumbai</option>
+          <option>Pune</option>
+          <option>Nashik</option>
+        </select>
+      </div>
+
+      <div class="form-group form-panel">
+        <label for="channelSelect">Channel (Select Multiple Channels)</label>
+        <select  multiple class="form-control" id="channelSelect">
+          <option>Channel 1</option>
+          <option>Channel 2</option>
+          <option>Channel 3</option>
+        </select>
+      </div>
+
+
+        <div class="form-group form-panel">
+          <label for="networkName">Network Name</label>
+          <input type="text" class="form-control" id="networkName" >
+        </div>
+
+       
+      <br>
+        <button type="submit" class="btn btn-primary">Submit</button>
+    </form>
+  </div>
+</section>
+
+ 
+<%- include('../dashboard/toggle.ejs') %>
