@@ -44,3 +44,7 @@ a {
     width: 100%;
   }
 }
+
+.form-check-label{
+  font-weight: 100;
+}
