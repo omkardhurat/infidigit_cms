@@ -27,6 +27,10 @@ a {
   background-repeat: no-repeat;
 }
 
+.listing{
+  padding: 20px;
+}
+
 .create-form{
   padding: 20px;
   display: flex;
@@ -47,4 +51,8 @@ a {
 
 .form-check-label{
   font-weight: 100;
+}
+
+.create-btn-div{
+  text-align: right;
 }

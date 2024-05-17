@@ -7,7 +7,45 @@
     <i class='bx bx-menu' ></i>
     <span class="text">Channel</span>
   </div>
-  <div class="create-form">
+
+  <div class="listing">
+    <div class="row">
+      <div class="form-group create-btn-div col-xs-12 col-md-12 col-sm-12">
+        <button type="button" class="btn btn-info view-form">Create Channel</button>
+      </div>
+    </div>
+    <table class="table">
+      <thead>
+        <tr>
+          <th scope="col">Sr No</th>
+          <th scope="col">Name</th>
+          <th scope="col">Code</th>
+          <th scope="col">Producer</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <th scope="row">1</th>
+          <td>Channel 1</td>
+          <td>101</td>
+          <td>ABC</td>
+        </tr>
+        <tr>
+          <th scope="row">2</th>
+          <td>Channel 2</td>
+          <td>102</td>
+          <td>XYZ</td>
+        </tr>
+        <tr>
+          <th scope="row">3</th>
+          <td>Channel 3</td>
+          <td>103</td>
+          <td>EFG</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+  <div class="create-form hide">
     <h4>Create Channel</h4>
     <br>
     <form>
@@ -45,10 +83,22 @@
           <input type="number" class="form-control" id="channelProducer" >
       </div>
       <br>
+        <button type="button" class="btn btn-danger view-listing">Cancel</button>
         <button type="submit" class="btn btn-primary">Submit</button>
     </form>
   </div>
 </section>
+
+<script>
+  $('.view-form').click(function(){
+    $('.listing').addClass('hide');
+    $('.create-form').removeClass('hide')
+  });
+  $('.view-listing').click(function(){
+    $('.listing').removeClass('hide');
+    $('.create-form').addClass('hide')
+  })
+  </script>
 
  
 <%- include('../dashboard/toggle.ejs') %>
