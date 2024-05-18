@@ -1,20 +1,20 @@
 var express = require('express');
 
-const { createConnection } = require("../database/dbConnect");
+// const { createConnection } = require("../database/dbConnect");
 var router = express.Router();
 
 
 /* GET home page. */
 router.get('/', async function(req, res, next) {
   
-  let connection = await createConnection();
-  // A simple SELECT query
-  // connection.connect(function(err) {
-  //   if (err) throw err;
-    connection.query("SELECT * from test", function (err, result, fields) {
-      if (err) throw err;
-      console.log(result);
-    });
+  // let connection = await createConnection();
+  // // A simple SELECT query
+  // // connection.connect(function(err) {
+  // //   if (err) throw err;
+  //   connection.query("SELECT * from test", function (err, result, fields) {
+  //     if (err) throw err;
+  //     console.log(result);
+  //   });
   // });
   res.render('login', { title: 'CMS Application' });
 });
