@@ -38,7 +38,7 @@ router.get('/network', function(req, res, next) {
 
 });
 
-router.get('/compaign', function(req, res, next) {
+router.get('/campaign', function(req, res, next) {
   res.render('user/compaign', { title: 'CMS Application' });
 
 });
