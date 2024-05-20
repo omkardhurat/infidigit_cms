@@ -6,7 +6,40 @@
             <i class='bx bx-menu'></i>
             <span class="text">Campaign</span>
         </div>
-        <div class="create-form">
+        <div class="listing">
+            <div class="row">
+              <div class="form-group create-btn-div col-xs-12 col-md-12 col-sm-12">
+                <button type="button" class="btn btn-info view-form">Create Compaign</button>
+              </div>
+            </div>
+            <table class="table">
+              <thead>
+                <tr>
+                  <th scope="col">Sr No</th>
+                  <th scope="col">Name</th>
+                  <th scope="col">Code</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <th scope="row">1</th>
+                  <td>Compaign 1</td>
+                  <td>101</td>
+                </tr>
+                <tr>
+                  <th scope="row">2</th>
+                  <td>Compaign 2</td>
+                  <td>102</td>
+                </tr>
+                <tr>
+                  <th scope="row">3</th>
+                  <td>Compaign 3</td>
+                  <td>103</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        <div class="create-form hide">
             <h4>Create Campaign</h4>
             <br>
             <form>
@@ -54,7 +87,16 @@
                         </select>
                     </div>
                 </div>
-
+                <div class="row">
+                    <div class="form-group col col-12 col-sm-6 col-md-6">
+                        <label for="product">Product</label>
+                        <input type="text" class="form-control" id="product">
+                    </div>
+                    <div class="form-group col col-12 col-sm-6 col-md-6">
+                        <label for="brand">Brand</label>
+                        <input type="text" class="form-control" id="brand">
+                    </div>
+                </div>
                 <div class="row">
                     <div class="form-group col col-12 col-sm-6 col-md-6">
                         <label for="startDate">Start Date</label>
@@ -90,10 +132,22 @@
 
 
                 <br>
+                <button type="button" class="btn btn-danger view-listing">Cancel</button>
                 <button type="submit" class="btn btn-primary">Submit</button>
             </form>
         </div>
     </section>
 
+
+    <script>
+        $('.view-form').click(function(){
+          $('.listing').addClass('hide');
+          $('.create-form').removeClass('hide')
+        });
+        $('.view-listing').click(function(){
+          $('.listing').removeClass('hide');
+          $('.create-form').addClass('hide')
+        })
+        </script>
 
     <%- include('../dashboard/toggle.ejs') %>
