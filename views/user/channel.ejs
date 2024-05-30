@@ -14,36 +14,32 @@
         <button type="button" class="btn btn-info view-form">Create Channel</button>
       </div>
     </div>
-    <table class="table">
-      <thead>
-        <tr>
-          <th scope="col">Sr No</th>
-          <th scope="col">Name</th>
-          <th scope="col">Code</th>
-          <th scope="col">Producer</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr>
-          <th scope="row">1</th>
-          <td>Channel 1</td>
-          <td>101</td>
-          <td>ABC</td>
-        </tr>
-        <tr>
-          <th scope="row">2</th>
-          <td>Channel 2</td>
-          <td>102</td>
-          <td>XYZ</td>
-        </tr>
-        <tr>
-          <th scope="row">3</th>
-          <td>Channel 3</td>
-          <td>103</td>
-          <td>EFG</td>
-        </tr>
-      </tbody>
-    </table>
+    <div class="table-responsive">
+      <table id="example" class="display table table-responsive" style="width:100%">
+        <thead>
+            <tr>
+                <th>Sr No</th>
+                <th>Name</th>
+                <th>State</th>
+                <th>City</th>
+                <th>Created At</th>
+                <th>Updated At</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>Tiger Nixon</td>
+                <td>System Architect</td>
+                <td>Edinburgh</td>
+                <td>61</td>
+                <td>2011-04-25</td>
+                <td>$320,800</td>
+            </tr>
+            
+        </tbody>
+        
+      </table> </div>
+
   </div>
   <div class="create-form hide">
     <h4>Create Channel</h4>
@@ -51,19 +47,13 @@
     <form>
       <div class="form-group form-panel">
         <label for="stateSelect">State</label>
-        <select class="form-control" id="stateSelect">
-          <option>Maharashtra</option>
-          <option>Karnataka</option>
-          <option>Telangana</option>
+        <select  class="js-example-basic-single stateSelect form-control" id="stateSelect" name="state">
         </select>
       </div>
 
       <div class="form-group form-panel">
         <label for="citySelect">City</label>
-        <select class="form-control" id="citySelect">
-          <option>Mumbai</option>
-          <option>Pune</option>
-          <option>Nashik</option>
+        <select class="js-example-basic-single citySelect form-control" id="citySelect" name="citySelect">
         </select>
       </div>
 
@@ -73,7 +63,7 @@
           <input type="text" class="form-control" id="channelName" >
         </div>
 
-        <div class="form-group form-panel">
+        <!-- <div class="form-group form-panel">
             <label for="channelCode">Channel Code</label>
             <input type="number" class="form-control" id="channelCode" >
         </div>
@@ -81,15 +71,30 @@
         <div class="form-group form-panel">
           <label for="channelProducer">Producer Name</label>
           <input type="number" class="form-control" id="channelProducer" >
-      </div>
+      </div> -->
       <br>
         <button type="button" class="btn btn-danger view-listing">Cancel</button>
-        <button type="submit" class="btn btn-primary">Submit</button>
+        <button type="button" class="btn btn-primary add-channel">Submit</button>
     </form>
   </div>
 </section>
 
 <script>
+  var states = [];
+  $(document).ready(function() {
+    new DataTable('#example', {
+      lengthMenu: [
+          [10, 25, 50, -1],
+          [10, 25, 50, 'All']
+      ]
+    });
+    if(states.length == 0){
+      loadStates();
+    }
+    $('.add-channel').click(function(e){
+      addChannel()
+    })
+  })
   $('.view-form').click(function(){
     $('.listing').addClass('hide');
     $('.create-form').removeClass('hide')
@@ -98,6 +103,76 @@
     $('.listing').removeClass('hide');
     $('.create-form').addClass('hide')
   })
+
+  
+
+
+function loadStates(){
+  $.ajax({
+      type : "GET",
+      url : "http://localhost:3000/config/states",
+      contentType : "application/json",
+      dataType : "json",  
+    }).done(function(data){
+      states = data.states;
+      $('#stateSelect').empty().append(`<option class="" value=""></option>`)
+      for(var i=0;i<states.length;i++){
+        $('#stateSelect').append(`<option class="" value="${states[i].id}" data-id="${states[i].id}">${states[i].name}</option>`)
+      }
+      $('.stateSelect').select2({
+        placeholder:'Select State'
+      })
+      .on('select2:select', function(e) {
+        console.log('Selecting: ' , e.params.data.id);
+        if(e.params.data.id != ''){
+        loadCities(e.params.data.id)
+        }
+      });;
+      $('.select2-selection').addClass('form-control');
+      return;
+  });
+}
+
+function loadCities(stateId){
+  console.log("state:"+stateId);
+  $.ajax({
+      type : "GET",
+      url : "http://localhost:3000/config/cities/"+stateId,
+      contentType : "application/json",
+      dataType : "json",  
+    }).done(function(data){
+      console.log("Resp:"+JSON.stringify(data));
+      let citites= data.citites;
+      $('#citySelect').empty().append(`<option class="" value=""></option>`)
+      for(var i=0;i<citites.length;i++){
+        $('#citySelect').append(`<option class="" value="${citites[i].id}" data-id="${citites[i].id}">${citites[i].name}</option>`)
+      }
+      $('.citySelect').select2({
+        placeholder: 'Select City'
+      })
+      $('.select2-selection').addClass('form-control');
+      return;
+  });
+}
+
+function addChannel(){
+  
+  let reqBody = {
+    state: $('#stateSelect').val(),
+    city: $('#citySelect').val(),
+    name: $('#channelName').val(),
+
+  }
+  $.ajax({
+      type : "POST",
+      url : "http://localhost:3000/channel/add",
+      data: reqBody,
+    }).done(function(data){
+      // console.log("Resp:"+JSON.stringify(data));
+      return;
+  });
+  alert("clicked submit method::"+JSON.stringify(reqBody))
+}
   </script>
 
  

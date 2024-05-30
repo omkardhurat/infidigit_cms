@@ -6,25 +6,40 @@ var router = express.Router();
 
 /* GET home page. */
 router.get('/', async function(req, res, next) {
-  
-  let connection = await createConnection();
-  // A simple SELECT query
-  // connection.connect(function(err) {
-  //   if (err) throw err;
-    connection.query("SELECT * from test", function (err, result, fields) {
-      if (err) throw err;
-      console.log(result);
-    });
-  res.render('login', { title: 'CMS Application' });
+  let jsonResp = { title: 'CMS Application' };
+  if(req.query.error){
+    jsonResp.error = req.query.error;
+  }
+  res.render('login', jsonResp);
 });
 
 /* Login */
-router.post('/dashboard', function(req, res, next) {
+router.post('/authenticate', async function(req, res, next) {
   console.log("reqBody::"+JSON.stringify(req.body))
   let reqBody = req.body;
   let username = reqBody.username;
   let password = reqBody.password;
+
+  let connection = await createConnection();
+  let sqlQuery = `SELECT * FROM USER WHERE EMAIL='${username}' AND PASSWORD='${password}'`
+  connection.query(sqlQuery, function (err, result, fields) {
+    if (err) {
+      res.render('login', { title: 'CMS Application', error: error });
+    };
+    if(result.length == 1){
+      req.session.user = result[0]
+      res.redirect('/dashboard');
+    }else{
+      res.redirect(`/?error=Invalid Credentials`);
+    }
+    console.log(result);
+  });
+});
+
+router.get('/dashboard', function(req, res, next) {
+  console.log(JSON.stringify(req.session));
   res.render('dashboard/userDashboard', { title: 'CMS Application' });
+
 });
 
 router.get('/channel', function(req, res, next) {

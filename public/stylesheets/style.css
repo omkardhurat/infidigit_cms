@@ -17,6 +17,10 @@ body {
     background-image: none !important;
   }
 }
+.no-border{
+  border: none;
+  box-shadow: none;
+}
 
 a {
   color: #00B7FF;
@@ -25,6 +29,14 @@ a {
 .login-bg {
   background-image: url(../images/bg1.png);
   background-repeat: no-repeat;
+}
+
+.center {
+  text-align: center !important;
+}
+
+.err-msg {
+  color: red !important;
 }
 
 .listing{
@@ -49,10 +61,105 @@ a {
   }
 }
 
+.no-padding{
+  padding: 0px !important;
+}
+
 .form-check-label{
   font-weight: 100;
 }
 
 .create-btn-div{
   text-align: right;
+}
+
+.selectBtn {
+  text-align: left;
+  color: black;
+  font-size: 16px;
+  border: none;
+  cursor: pointer;
+  border: 1px solid #cccccc;
+}
+
+.selectBtn:hover, .selectBtn:focus {
+}
+
+#searchFilterIp {
+  position: fixed;
+  width: 45.5%;
+  box-sizing: border-box;
+  background-image: url('searchicon.png');
+  background-position: 14px 12px;
+  background-repeat: no-repeat;
+  font-size: 16px;
+  padding: 10px 10px 10px 10px;
+  border: none;
+  border-bottom: 1px solid #ddd;
+}
+
+@media only screen and (max-width: 600px) {
+  #searchFilterIp {
+    width: 70%;
+  }
+}
+
+#searchFilterIp:focus {outline: 3px solid #ddd;}
+
+.selectWrapper {
+  position: relative;
+  display: inline-block;
+}
+
+.selectContent {
+  height: 50vh;
+  display: none;
+  position: absolute;
+  background-color: white;
+  min-width: 100%;
+  overflow: auto;
+  border: 1px solid #ddd;
+  z-index: 1;
+}
+
+.selectOptions{
+  margin-top: 50px;
+}
+.selectOptions span {
+  cursor: pointer;
+  color: black;
+  padding: 12px 16px;
+  text-decoration: none;
+  display: block;
+}
+
+.selectWrapper a:hover {background-color: #ddd;}
+
+.show {display: block;}
+
+.select2-selection__rendered{
+  line-height: 20px !important;
+}
+.select2-container{
+  width: 100% !important;
+}
+
+.select2-container .select2-selection--single{
+  height: 35px !important;
+}
+
+.dataTables_length{
+  margin-top: 10px !important;
+  margin-bottom: 10px !important;
+  margin-left: 15px !important;
+  text-align: left !important;
+}
+.dataTables_filter{
+  text-align: left !important;
+}
+
+.dataTables_length select {
+  margin-left: 20px !important;
+  width: 50px !important;
+  height: 35px !important;
 }

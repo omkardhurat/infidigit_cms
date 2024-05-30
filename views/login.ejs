@@ -14,14 +14,18 @@
 
     <%- include('./scripts.ejs') %>
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
-    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+    <!-- <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script> -->
 </head>
 <body class="login-bg">
     <div class="container" >
         <div class="wrapper">
-            <form action="/dashboard" method="post" name="Login_Form" class="form-signin">
+            <form action="/authenticate" method="post" name="Login_Form" class="form-signin">
+                <% if (locals.error) { %>
+                <div class="center">
+                    <span class="err-msg"><%- error %></span>
+                </div>
+                <% } %>
                 <h3 class="form-signin-heading">CMS Application</h3>
-
                 <input type="text" class="form-control" name="username" placeholder="Username" required="" autofocus="" />
                 <br />
                 <input type="password" class="form-control" name="password" placeholder="Password" required=""/>

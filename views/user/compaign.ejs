@@ -8,37 +8,37 @@
         </div>
         <div class="listing">
             <div class="row">
-              <div class="form-group create-btn-div col-xs-12 col-md-12 col-sm-12">
-                <button type="button" class="btn btn-info view-form">Create Compaign</button>
-              </div>
+                <div class="form-group create-btn-div col-xs-12 col-md-12 col-sm-12">
+                    <button type="button" class="btn btn-info view-form">Create Compaign</button>
+                </div>
             </div>
             <table class="table">
-              <thead>
-                <tr>
-                  <th scope="col">Sr No</th>
-                  <th scope="col">Name</th>
-                  <th scope="col">Code</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr>
-                  <th scope="row">1</th>
-                  <td>Compaign 1</td>
-                  <td>101</td>
-                </tr>
-                <tr>
-                  <th scope="row">2</th>
-                  <td>Compaign 2</td>
-                  <td>102</td>
-                </tr>
-                <tr>
-                  <th scope="row">3</th>
-                  <td>Compaign 3</td>
-                  <td>103</td>
-                </tr>
-              </tbody>
+                <thead>
+                    <tr>
+                        <th scope="col">Sr No</th>
+                        <th scope="col">Name</th>
+                        <th scope="col">Code</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <th scope="row">1</th>
+                        <td>Compaign 1</td>
+                        <td>101</td>
+                    </tr>
+                    <tr>
+                        <th scope="row">2</th>
+                        <td>Compaign 2</td>
+                        <td>102</td>
+                    </tr>
+                    <tr>
+                        <th scope="row">3</th>
+                        <td>Compaign 3</td>
+                        <td>103</td>
+                    </tr>
+                </tbody>
             </table>
-          </div>
+        </div>
         <div class="create-form hide">
             <h4>Create Campaign</h4>
             <br>
@@ -59,7 +59,7 @@
                             <option>Telangana</option>
                         </select>
                     </div>
-    
+
                     <div class="form-group col col-12 col-sm-6 col-md-6">
                         <label for="citySelect">City</label>
                         <select class="form-control" id="citySelect">
@@ -107,28 +107,30 @@
                         <input type="date" class="form-control" id="endDate">
                     </div>
                 </div>
-                
+
                 <fieldset class="form-group">
                     <div class="row">
                         <div class="form-group col col-12 col-sm-6 col-md-6">
                             <label for="slotType">Slot Type</label>
                             <div>
                                 <div class="form-check">
-                                <input class="form-check-input" type="radio" name="slotType" id="staticSlot" value="static" checked>
-                                <label class="form-check-label" for="staticSlot">
-                                    Static
-                                </label>
+                                    <input class="form-check-input" type="radio" name="slotType" id="staticSlot"
+                                        value="static" checked>
+                                    <label class="form-check-label" for="staticSlot">
+                                        Static
+                                    </label>
                                 </div>
                                 <div class="form-check">
-                                <input class="form-check-input" type="radio" name="slotType" id="dynamicSlot" value="dynamic">
-                                <label class="form-check-label" for="dynamicSlot">
-                                    Dynamic
-                                </label>
+                                    <input class="form-check-input" type="radio" name="slotType" id="dynamicSlot"
+                                        value="dynamic">
+                                    <label class="form-check-label" for="dynamicSlot">
+                                        Dynamic
+                                    </label>
                                 </div>
                             </div>
                         </div>
                     </div>
-                  </fieldset>
+                </fieldset>
 
 
                 <br>
@@ -140,14 +142,14 @@
 
 
     <script>
-        $('.view-form').click(function(){
-          $('.listing').addClass('hide');
-          $('.create-form').removeClass('hide')
+        $('.view-form').click(function () {
+            $('.listing').addClass('hide');
+            $('.create-form').removeClass('hide')
         });
-        $('.view-listing').click(function(){
-          $('.listing').removeClass('hide');
-          $('.create-form').addClass('hide')
+        $('.view-listing').click(function () {
+            $('.listing').removeClass('hide');
+            $('.create-form').addClass('hide')
         })
-        </script>
+    </script>
 
     <%- include('../dashboard/toggle.ejs') %>
