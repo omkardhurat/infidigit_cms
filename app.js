@@ -11,6 +11,7 @@ var usersRouter = require('./routes/users');
 var configRouter = require('./routes/config');
 var channel = require('./routes/channel');
 var network = require('./routes/network');
+var compaign = require('./routes/compaign');
 
 var app = express();
 // view engine setup
@@ -37,6 +38,8 @@ app.use('/users', usersRouter);
 app.use('/config', configRouter);
 app.use('/channel', channel);
 app.use('/network', network);
+app.use('/compaign', compaign);
+
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {

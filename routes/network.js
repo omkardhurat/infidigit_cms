@@ -22,6 +22,19 @@ router.get('/get', async function(req, res, next) {
     
 });
 
+router.get('/getByCity', async function(req, res, next) {
+  let connection = await createConnection();
+  let city = req.query.city;
+  let countQuery = `SELECT * FROM NETWORK where city = ${city}`
+  connection.query(countQuery, function (err, result, fields) {
+    if (err) {
+      res.status(500).json({status: 500, message: 'Something Went wrong. Please contact administrator'});
+    }
+    res.status(200).json({ status: 200, networks: result});
+  });
+  
+});
+
 let validateNetwork = async (network) => {
     if(network.state == undefined || network.state == null || network.state == ''){
       return false;

@@ -12,32 +12,20 @@
                     <button type="button" class="btn btn-info view-form">Create Compaign</button>
                 </div>
             </div>
-            <table class="table">
-                <thead>
-                    <tr>
-                        <th scope="col">Sr No</th>
-                        <th scope="col">Name</th>
-                        <th scope="col">Code</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr>
-                        <th scope="row">1</th>
-                        <td>Compaign 1</td>
-                        <td>101</td>
-                    </tr>
-                    <tr>
-                        <th scope="row">2</th>
-                        <td>Compaign 2</td>
-                        <td>102</td>
-                    </tr>
-                    <tr>
-                        <th scope="row">3</th>
-                        <td>Compaign 3</td>
-                        <td>103</td>
-                    </tr>
-                </tbody>
-            </table>
+            <div class="table-responsive">
+                <table id="example" class="display table table-responsive" style="width:100%">
+                  <thead>
+                      <tr>
+                          <th>Sr No</th>
+                          <th>Name</th>
+                          <th>State</th>
+                          <th>City</th>
+                          <th>Created At</th>
+                          <th>Updated At</th>
+                      </tr>
+                  </thead>
+                </table>
+              </div>
         </div>
         <div class="create-form hide">
             <h4>Create Campaign</h4>
@@ -45,45 +33,34 @@
             <form>
                 <div class="row">
                     <div class="form-group col-xs-12 col-md-12 col-sm-12">
-                        <label for="networkName">Campaign Name</label>
-                        <input type="text" class="form-control" id="networkName">
+                        <label for="compaignName">Campaign Name</label>
+                        <input type="text" class="form-control" id="compaignName">
                     </div>
                 </div>
 
                 <div class="row">
-                    <div class="form-group col col-12 col-sm-6 col-md-6">
+                    <div class="form-group form-panel col col-12 col-sm-6 col-md-6">
                         <label for="stateSelect">State</label>
-                        <select class="form-control" id="stateSelect">
-                            <option>Maharashtra</option>
-                            <option>Karnataka</option>
-                            <option>Telangana</option>
+                        <select  class="js-example-basic-single stateSelect form-control" id="stateSelect" name="state">
                         </select>
-                    </div>
-
-                    <div class="form-group col col-12 col-sm-6 col-md-6">
+                      </div>
+                
+                      <div class="form-group form-panel col col-12 col-sm-6 col-md-6">
                         <label for="citySelect">City</label>
-                        <select class="form-control" id="citySelect">
-                            <option>Mumbai</option>
-                            <option>Pune</option>
-                            <option>Nashik</option>
+                        <select class="js-example-basic-single citySelect form-control" id="citySelect" name="citySelect">
                         </select>
-                    </div>
+                      </div>
                 </div>
                 <div class="row">
                     <div class="form-group col col-12 col-sm-6 col-md-6">
                         <label for="networkSelect">Network</label>
-                        <select class="form-control" id="networkSelect">
-                            <option>Network 1</option>
-                            <option>Network 2</option>
-                            <option>Network 3</option>
+                        <select class="js-example-basic-single networkSelect form-control" id="networkSelect" name="networkSelect">
                         </select>
                     </div>
                     <div class="form-group col col-12 col-sm-6 col-md-6">
                         <label for="channelSelect">Channel (Will Be Populated as per Network Selection)</label>
-                        <select multiple class="form-control" id="channelSelect">
-                            <option>Channel 1</option>
-                            <option>Channel 2</option>
-                            <option>Channel 3</option>
+                        <select multiple class="js-example-basic-single channelSelect select2-multiple form-control" id="channelSelect" name="channelSelect">
+          
                         </select>
                     </div>
                 </div>
@@ -115,14 +92,14 @@
                             <div>
                                 <div class="form-check">
                                     <input class="form-check-input" type="radio" name="slotType" id="staticSlot"
-                                        value="static" checked>
+                                        value="S" checked>
                                     <label class="form-check-label" for="staticSlot">
                                         Static
                                     </label>
                                 </div>
                                 <div class="form-check">
                                     <input class="form-check-input" type="radio" name="slotType" id="dynamicSlot"
-                                        value="dynamic">
+                                        value="D">
                                     <label class="form-check-label" for="dynamicSlot">
                                         Dynamic
                                     </label>
@@ -135,13 +112,27 @@
 
                 <br>
                 <button type="button" class="btn btn-danger view-listing">Cancel</button>
-                <button type="submit" class="btn btn-primary">Submit</button>
+                <button type="button" class="btn btn-primary add-compaign">Submit</button>
             </form>
         </div>
     </section>
 
 
     <script>
+
+$(document).ready(function() {
+  var states = [];
+  loadCompaigns();
+  $('.channelSelect').select2()
+    if(states.length == 0){
+      loadStates();
+    }
+    $('.add-compaign').click(function(e){
+        addCompaign()
+    })
+  })
+
+
         $('.view-form').click(function () {
             $('.listing').addClass('hide');
             $('.create-form').removeClass('hide')
@@ -150,6 +141,176 @@
             $('.listing').removeClass('hide');
             $('.create-form').addClass('hide')
         })
+
+
+
+
+function loadStates(){
+  $.ajax({
+      type : "GET",
+      url : "http://localhost:3000/config/states",
+      contentType : "application/json",
+      dataType : "json",  
+    }).done(function(data){
+      states = data.states;
+      $('#stateSelect').empty().append(`<option class="" value=""></option>`)
+      for(var i=0;i<states.length;i++){
+        $('#stateSelect').append(`<option class="" value="${states[i].id}" data-id="${states[i].id}">${states[i].name}</option>`)
+      }
+      $('.stateSelect').select2({
+        placeholder:'Select State'
+      })
+      .on('select2:select', function(e) {
+        console.log('Selecting: ' , e.params.data.id);
+        if(e.params.data.id != ''){
+        loadCities(e.params.data.id)
+        }
+      });;
+      $('.select2-selection').addClass('form-control');
+      return;
+  });
+}
+
+function loadCities(stateId){
+  console.log("state:"+stateId);
+  $.ajax({
+      type : "GET",
+      url : "http://localhost:3000/config/cities/"+stateId,
+      contentType : "application/json",
+      dataType : "json",  
+    }).done(function(data){
+      console.log("Resp:"+JSON.stringify(data));
+      let citites= data.citites;
+      $('#citySelect').empty().append(`<option class="" value=""></option>`)
+      for(var i=0;i<citites.length;i++){
+        $('#citySelect').append(`<option class="" value="${citites[i].id}" data-id="${citites[i].id}">${citites[i].name}</option>`)
+      }
+      $('.citySelect').select2({
+        placeholder: 'Select City'
+      })
+      .on('select2:select', function(e) {
+        console.log('Selecting: ' , e.params.data.id);
+        if(e.params.data.id != ''){
+            loadNetworks(e.params.data.id)
+        }
+      });;
+      $('.select2-selection').addClass('form-control');
+      return;
+  });
+}
+
+function loadCompaigns(){
+  $.ajax({
+      type : "GET",
+      url : "http://localhost:3000/compaign/get",
+      contentType : "application/json",
+      dataType : "json",  
+    }).done(function(data){
+      console.log("Resp:"+JSON.stringify(data));
+      let dataSet = data.compaigns;
+      
+    
+    new DataTable('#example', {
+      data: dataSet, 
+      "retrieve": true,
+      columns: [
+        { data: 'id' },
+        { data: 'name' },
+        { data: 'state' },
+        { data: 'city' },
+        { data: 'created_at' },
+        { data: 'updated_at' }
+      ]
+    });
+      return;
+  });
+
+ 
+
+}
+
+function loadNetworks(cityId){
+  console.log("state:"+cityId);
+  $.ajax({
+      type : "GET",
+      url : "http://localhost:3000/network/getByCity?city="+cityId,
+      contentType : "application/json",
+      dataType : "json",  
+    }).done(function(data){
+      console.log("Resp:"+JSON.stringify(data));
+      let networks= data.networks;
+      $('#networkSelect').empty().append(`<option class="" value=""></option>`)
+      for(var i=0;i<networks.length;i++){
+        $('#networkSelect').append(`<option class="" value="${networks[i].id}" data-id="${networks[i].id}">${networks[i].name}</option>`)
+      }
+      $('.networkSelect').select2({
+        placeholder: 'Select Network'
+      })
+      .on('select2:select', function(e) {
+        console.log('Selecting: ' , e.params.data.id);
+        if(e.params.data.id != ''){
+            loadChannels(e.params.data.id)
+        }
+      });;
+      $('.select2-selection').addClass('form-control');
+      return;
+  });
+}
+
+function loadChannels(networks){
+  console.log("state:"+networks);
+  $.ajax({
+      type : "GET",
+      url : "http://localhost:3000/channel/getByNetwork?network="+networks,
+      contentType : "application/json",
+      dataType : "json",  
+    }).done(function(data){
+      console.log("Resp:"+JSON.stringify(data));
+      let channels= data.channels;
+      $('#channelSelect').empty().append(`<option class="" value=""></option>`)
+      for(var i=0;i<channels.length;i++){
+        $('#channelSelect').append(`<option class="" value="${channels[i].id}" data-id="${channels[i].id}">${channels[i].name}</option>`)
+      }
+      $('.channelSelect').select2({
+        placeholder: 'Select Network'
+      })
+      $('.select2-selection').addClass('form-control');
+      return;
+  });
+}
+
+function addCompaign(){
+//   network, channels, product, brand, startDate, endDate
+  let reqBody = {
+    state: $('#stateSelect').val(),
+    city: $('#citySelect').val(),
+    name: $('#compaignName').val(),
+    network: $('#networkSelect').val(),
+    channels: $('#channelSelect').val(),
+    product: $('#product').val(),
+    brand: $('#brand').val(),
+    startDate: $('#startDate').val(),
+    endDate: $('#endDate').val(),
+    slotType: $("input[name='slotType']:checked").val()
+  }
+  $.ajax({
+      type : "POST",
+      url : "http://localhost:3000/compaign/add",
+      data: reqBody,
+      success: function(data){
+        console.log(JSON.stringify(data));
+        // $('.view-listing').trigger('click');
+        alert(data.message);
+        window.location.reload();
+      },
+      error: function(xhr, ajaxOptions, thrownError) {
+        alert(xhr.responseText);
+      }
+    });
+}
+
+
+
     </script>
 
     <%- include('../dashboard/toggle.ejs') %>

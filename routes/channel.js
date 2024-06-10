@@ -34,6 +34,19 @@ router.get('/getByCity', async function(req, res, next) {
   
 });
 
+router.get('/getByNetwork', async function(req, res, next) {
+  let connection = await createConnection();
+  let network = req.query.network;
+  let countQuery = `SELECT * FROM CHANNEL`
+  connection.query(countQuery, function (err, result, fields) {
+    if (err) {
+      res.status(500).json({status: 500, message: 'Something Went wrong. Please contact administrator'});
+    }
+    res.status(200).json({ status: 200, channels: result});
+  });
+  
+});
+
 let validateChannel = async (channel) => {
   if(channel.state == undefined || channel.state == null || channel.state == ''){
     return false;
