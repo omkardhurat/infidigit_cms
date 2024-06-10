@@ -13,32 +13,24 @@
         <button type="button" class="btn btn-info view-form">Create Network</button>
       </div>
     </div>
-    <table class="table">
-      <thead>
-        <tr>
-          <th scope="col">Sr No</th>
-          <th scope="col">Name</th>
-          <th scope="col">Code</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr>
-          <th scope="row">1</th>
-          <td>Network 1</td>
-          <td>101</td>
-        </tr>
-        <tr>
-          <th scope="row">2</th>
-          <td>Network 2</td>
-          <td>102</td>
-        </tr>
-        <tr>
-          <th scope="row">3</th>
-          <td>Network 3</td>
-          <td>103</td>
-        </tr>
-      </tbody>
-    </table>
+
+    <div class="table-responsive">
+      <table id="example" class="display table table-responsive" style="width:100%">
+        <thead>
+            <tr>
+                <th>Sr No</th>
+                <th>Name</th>
+                <th>State</th>
+                <th>City</th>
+                <th>Created At</th>
+                <th>Updated At</th>
+            </tr>
+        </thead>
+      
+        
+      </table>
+    </div>
+    
   </div>
   <div class="create-form hide">
     <h4>Create Network</h4>
@@ -46,31 +38,22 @@
     <form>
       <div class="form-group form-panel">
         <label for="stateSelect">State</label>
-        <select class="form-control" id="stateSelect">
-          <option>Maharashtra</option>
-          <option>Karnataka</option>
-          <option>Telangana</option>
+        <select  class="js-example-basic-single stateSelect form-control" id="stateSelect" name="state">
         </select>
       </div>
 
       <div class="form-group form-panel">
         <label for="citySelect">City</label>
-        <select class="form-control" id="citySelect">
-          <option>Mumbai</option>
-          <option>Pune</option>
-          <option>Nashik</option>
+        <select class="js-example-basic-single citySelect form-control" id="citySelect" name="citySelect">
         </select>
       </div>
 
       <div class="form-group form-panel">
-        <label for="channelSelect">Channel (Select Multiple Channels)</label>
-        <select  multiple class="form-control" id="channelSelect">
-          <option>Channel 1</option>
-          <option>Channel 2</option>
-          <option>Channel 3</option>
+        <label for="channelSelect">Channel</label>
+        <select multiple class="js-example-basic-single channelSelect select2-multiple form-control" id="channelSelect" name="channelSelect">
+          
         </select>
       </div>
-
 
         <div class="form-group form-panel">
           <label for="networkName">Network Name</label>
@@ -80,12 +63,25 @@
        
       <br>
       <button type="button" class="btn btn-danger view-listing">Cancel</button>
-        <button type="submit" class="btn btn-primary">Submit</button>
+        <button type="button" class="add-network btn btn-primary">Submit</button>
     </form>
   </div>
 </section>
 
 <script>
+
+$(document).ready(function() {
+  var states = [];
+  loadNetworks();
+  $('.channelSelect').select2()
+    if(states.length == 0){
+      loadStates();
+    }
+    $('.add-network').click(function(e){
+      addNetwork()
+    })
+  })
+
   $('.view-form').click(function(){
     $('.listing').addClass('hide');
     $('.create-form').removeClass('hide')
@@ -94,5 +90,135 @@
     $('.listing').removeClass('hide');
     $('.create-form').addClass('hide')
   })
-  </script>
+
+
+
+function loadStates(){
+  $.ajax({
+      type : "GET",
+      url : "http://localhost:3000/config/states",
+      contentType : "application/json",
+      dataType : "json",  
+    }).done(function(data){
+      states = data.states;
+      $('#stateSelect').empty().append(`<option class="" value=""></option>`)
+      for(var i=0;i<states.length;i++){
+        $('#stateSelect').append(`<option class="" value="${states[i].id}" data-id="${states[i].id}">${states[i].name}</option>`)
+      }
+      $('.stateSelect').select2({
+        placeholder:'Select State'
+      })
+      .on('select2:select', function(e) {
+        console.log('Selecting: ' , e.params.data.id);
+        if(e.params.data.id != ''){
+        loadCities(e.params.data.id)
+        }
+      });;
+      $('.select2-selection').addClass('form-control');
+      return;
+  });
+}
+
+function loadCities(stateId){
+  console.log("state:"+stateId);
+  $.ajax({
+      type : "GET",
+      url : "http://localhost:3000/config/cities/"+stateId,
+      contentType : "application/json",
+      dataType : "json",  
+    }).done(function(data){
+      console.log("Resp:"+JSON.stringify(data));
+      let citites= data.citites;
+      $('#citySelect').empty().append(`<option class="" value=""></option>`)
+      for(var i=0;i<citites.length;i++){
+        $('#citySelect').append(`<option class="" value="${citites[i].id}" data-id="${citites[i].id}">${citites[i].name}</option>`)
+      }
+      $('.citySelect').select2({
+        placeholder: 'Select City'
+      })
+      .on('select2:select', function(e) {
+        console.log('Selecting: ' , e.params.data.id);
+        if(e.params.data.id != ''){
+        loadChannels(e.params.data.id)
+        }
+      });;
+      $('.select2-selection').addClass('form-control');
+      return;
+  });
+}
+
+function loadChannels(cityId){
+  console.log("state:"+cityId);
+  $.ajax({
+      type : "GET",
+      url : "http://localhost:3000/channel/getByCity?city="+cityId,
+      contentType : "application/json",
+      dataType : "json",  
+    }).done(function(data){
+      console.log("Resp:"+JSON.stringify(data));
+      let channels= data.channels;
+      $('#channelSelect').empty().append(`<option class="" value=""></option>`)
+      for(var i=0;i<channels.length;i++){
+        $('#channelSelect').append(`<option class="" value="${channels[i].id}" data-id="${channels[i].id}">${channels[i].name}</option>`)
+      }
+      $('.channelSelect').select2({
+        placeholder: 'Select Channel'
+      })
+      $('.select2-selection').addClass('form-control');
+      return;
+  });
+}
+
+function loadNetworks(){
+  $.ajax({
+      type : "GET",
+      url : "http://localhost:3000/network/get",
+      contentType : "application/json",
+      dataType : "json",  
+    }).done(function(data){
+      console.log("Resp:"+JSON.stringify(data));
+      let dataSet = data.networks;
+      
+    
+    new DataTable('#example', {
+      data: dataSet, 
+      "retrieve": true,
+      columns: [
+        { data: 'id' },
+        { data: 'name' },
+        { data: 'state' },
+        { data: 'city' },
+        { data: 'created_at' },
+        { data: 'updated_at' }
+      ]
+    });
+      return;
+  });
+}
+
+function addNetwork(){
+  
+  let reqBody = {
+    state: $('#stateSelect').val(),
+    city: $('#citySelect').val(),
+    name: $('#networkName').val(),
+    channels: $('#channelSelect').val()
+  }
+  $.ajax({
+      type : "POST",
+      url : "http://localhost:3000/network/add",
+      data: reqBody,
+      success: function(data){
+        console.log(JSON.stringify(data));
+        // $('.view-listing').trigger('click');
+        alert(data.message);
+        window.location.reload();
+      },
+      error: function(xhr, ajaxOptions, thrownError) {
+        alert(xhr.responseText);
+      }
+    });
+}
+
+</script>
 <%- include('../dashboard/toggle.ejs') %>

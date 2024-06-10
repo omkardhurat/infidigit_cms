@@ -15,6 +15,7 @@
       </div>
     </div>
     <div class="table-responsive">
+      
       <table id="example" class="display table table-responsive" style="width:100%">
         <thead>
             <tr>
@@ -26,17 +27,7 @@
                 <th>Updated At</th>
             </tr>
         </thead>
-        <tbody>
-            <tr>
-                <td>Tiger Nixon</td>
-                <td>System Architect</td>
-                <td>Edinburgh</td>
-                <td>61</td>
-                <td>2011-04-25</td>
-                <td>$320,800</td>
-            </tr>
-            
-        </tbody>
+      
         
       </table> </div>
 
@@ -82,12 +73,14 @@
 <script>
   var states = [];
   $(document).ready(function() {
-    new DataTable('#example', {
-      lengthMenu: [
-          [10, 25, 50, -1],
-          [10, 25, 50, 'All']
-      ]
-    });
+    let channels = []
+    loadChannels();
+    // new DataTable('#example', {
+    //   lengthMenu: [
+    //       [10, 25, 50, -1],
+    //       [10, 25, 50, 'All']
+    //   ]
+    // });
     if(states.length == 0){
       loadStates();
     }
@@ -155,6 +148,33 @@ function loadCities(stateId){
   });
 }
 
+function loadChannels(){
+  $.ajax({
+      type : "GET",
+      url : "http://localhost:3000/channel/get",
+      contentType : "application/json",
+      dataType : "json",  
+    }).done(function(data){
+      console.log("Resp:"+JSON.stringify(data));
+      let dataSet = data.channels;
+      
+    
+    new DataTable('#example', {
+      data: dataSet, 
+      "retrieve": true,
+      columns: [
+        { data: 'id' },
+        { data: 'name' },
+        { data: 'state' },
+        { data: 'city' },
+        { data: 'created_at' },
+        { data: 'updated_at' }
+      ]
+    });
+      return;
+  });
+}
+
 function addChannel(){
   
   let reqBody = {
@@ -167,13 +187,19 @@ function addChannel(){
       type : "POST",
       url : "http://localhost:3000/channel/add",
       data: reqBody,
-    }).done(function(data){
-      // console.log("Resp:"+JSON.stringify(data));
-      return;
-  });
-  alert("clicked submit method::"+JSON.stringify(reqBody))
+      success: function(data){
+        console.log(JSON.stringify(data));
+        // $('.view-listing').trigger('click');
+        alert(data.message);
+        window.location.reload();
+      },
+      error: function(xhr, ajaxOptions, thrownError) {
+        alert(xhr.responseText);
+      }
+    });
 }
-  </script>
+ 
+</script>
 
  
 <%- include('../dashboard/toggle.ejs') %>
