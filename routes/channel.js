@@ -54,6 +54,8 @@ let validateChannel = async (channel) => {
     return false;
   }else if(channel.name == undefined || channel.name == null || channel.name == ''){
     return false;
+  }else if(channel.producer == undefined || channel.producer == null || channel.producer == ''){
+    return false;
   }else{
     return true;
   }
@@ -65,7 +67,7 @@ router.post('/add', async function(req, res, next) {
   let validateData = await validateChannel(channel);
   console.log(validateData);
   if(validateData){
-    let insertQuery = `INSERT INTO CHANNEL(name, state, city) values ('${channel.name}', ${channel.state}, ${channel.city})`;
+    let insertQuery = `INSERT INTO CHANNEL(name, state, city, producer) values ('${channel.name}', ${channel.state}, ${channel.city}, '${channel.producer}')`;
     connection.query(insertQuery, function (err, result, fields) {
       if (err) {
         res.status(500).json({status: 500, message: 'Something Went wrong. Please contact administrator'});

@@ -51,7 +51,15 @@
         </a>
        
       </li>
+      <% if (session.userType == 'admin') { %>
+      <li>
+        <a href="/user">
+          <i class='bx bx-user' ></i>
+          <span class="link_name">User</span>
+        </a>
+      </li>
       
+      <% } %>
       
       <li>
     <div class="profile-details">

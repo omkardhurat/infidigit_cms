@@ -58,11 +58,11 @@
             <label for="channelCode">Channel Code</label>
             <input type="number" class="form-control" id="channelCode" >
         </div>
-
+-->
         <div class="form-group form-panel">
           <label for="channelProducer">Producer Name</label>
-          <input type="number" class="form-control" id="channelProducer" >
-      </div> -->
+          <input type="text" class="form-control" id="channelProducer" >
+      </div> 
       <br>
         <button type="button" class="btn btn-danger view-listing">Cancel</button>
         <button type="button" class="btn btn-primary add-channel">Submit</button>
@@ -181,7 +181,7 @@ function addChannel(){
     state: $('#stateSelect').val(),
     city: $('#citySelect').val(),
     name: $('#channelName').val(),
-
+    producer: $('#channelProducer').val()
   }
   $.ajax({
       type : "POST",

@@ -1,0 +1,145 @@
+
+<%- include('../dashboard/sidemenu.ejs') %>
+
+
+<section class="home-section">
+  <div class="home-content">
+    <i class='bx bx-menu' ></i>
+    <span class="text">User</span>
+  </div>
+
+  <div class="listing">
+    <div class="row">
+      <div class="form-group create-btn-div col-xs-12 col-md-12 col-sm-12">
+        <button type="button" class="btn btn-info view-form">Create User</button>
+      </div>
+    </div>
+    <div class="table-responsive">
+      
+      <table id="userTable" class="display table table-responsive" style="width:100%">
+        <thead>
+            <tr>
+                <th>Sr No</th>
+                <th>Name</th>
+                <!-- <th>Email</th> -->
+                <th>User Type</th>
+                <th>username</th>
+                <th>Created At</th>
+                <th>Updated At</th>
+            </tr>
+        </thead>
+      
+        
+      </table> </div>
+
+  </div>
+  <div class="create-form hide">
+    <h4>Create User</h4>
+    <br>
+    <form>
+      
+        <div class="form-group form-panel">
+          <label for="name">Name</label>
+          <input type="text" class="form-control" id="name" >
+        </div>
+
+        <!-- <div class="form-group form-panel">
+            <label for="email">Email</label>
+            <input type="text" class="form-control" id="email" >
+          </div> -->
+
+
+        <div class="form-group form-panel">
+            <label for="userType">User Type</label>
+            <select id="userType" class="form-control">
+                <option value="user">user</option>
+                <option value="admin">admin</option>
+            </select>
+          </div>
+
+        <div class="form-group form-panel">
+            <label for="username">Username</label>
+            <input type="test" class="form-control" id="username" >
+        </div>
+
+        <div class="form-group form-panel">
+          <label for="userPassword">Password</label>
+          <input type="password" class="form-control" id="userPassword" >
+      </div> 
+      <br>
+        <button type="button" class="btn btn-danger view-listing">Cancel</button>
+        <button type="button" class="btn btn-primary add-user">Submit</button>
+    </form>
+  </div>
+</section>
+
+ <script>
+     $('.view-form').click(function(){
+    $('.listing').addClass('hide');
+    $('.create-form').removeClass('hide')
+  });
+  $('.view-listing').click(function(){
+    $('.listing').removeClass('hide');
+    $('.create-form').addClass('hide')
+  })
+  $(document).ready(function() {
+    loadUsers();
+    $('.add-user').click(function(e){
+      addUser()
+    })
+  })
+  function addUser(){
+  
+    let reqBody = {
+        name: $('#name').val(),
+        userType: $('#userType').val(),
+        username: $('#username').val(),
+        password: $('#userPassword').val()
+    }
+    $.ajax({
+        type : "POST",
+        url : "http://localhost:3000/users/add",
+        data: reqBody,
+        success: function(data){
+            console.log(JSON.stringify(data));
+            // $('.view-listing').trigger('click');
+            alert(data.message);
+            window.location.reload();
+        },
+        error: function(xhr, ajaxOptions, thrownError) {
+            alert(xhr.responseText);
+        }
+        });
+    }
+    
+    function loadUsers(){
+        $.ajax({
+            type : "GET",
+            url : "http://localhost:3000/users/get",
+            contentType : "application/json",
+            dataType : "json",  
+            }).done(function(data){
+            console.log("Resp:"+JSON.stringify(data));
+            let dataSet = data.users;
+            
+            
+            new DataTable('#userTable', {
+            data: dataSet, 
+            "retrieve": true,
+            columns: [
+                { data: 'userId' },
+                { data: 'name' },
+                // { data: 'email' },
+                { data: 'userType' },
+                { data: 'username' },
+                { data: 'created_at' },
+                { data: 'updated_at' }
+            ]
+            });
+            return;
+        });
+}
+
+  
+ </script>
+<%- include('../dashboard/toggle.ejs') %>
