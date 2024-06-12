@@ -1,6 +1,6 @@
 
     <meta charset="UTF-8">
-    <!--<title> Drop Down Sidebar Menu | CodingLab </title>-->
+    <title> <%- title %> </title>
     <!-- Latest compiled and minified CSS -->
     <%- include('../scripts.ejs') %>
     <script src="https://cdn-script.com/ajax/libs/jquery/3.7.1/jquery.js"></script>
@@ -58,20 +58,23 @@
           <span class="link_name">User</span>
         </a>
       </li>
+
+      <li>
+        <a href="/client">
+          <i class='bx bx-user' ></i>
+          <span class="link_name">Client</span>
+        </a>
+      </li>
       
       <% } %>
-      
       <li>
-    <div class="profile-details">
-      <div class="profile-content">
-        <!--<img src="image/profile.jpg" alt="profileImg">-->
-      </div>
-      <div class="name-job">
-        <div class="profile_name">User</div>
-        <div class="job">Designation</div>
-      </div>
-      <i class='bx bx-log-out' ></i>
-    </div>
+        <a href="/logout">
+          <i class='bx bx-log-out' ></i>
+          <span class="link_name">Logout</span>
+        </a>
+      </li>
+      <li>
+   
   </li>
 </ul>
   </div>

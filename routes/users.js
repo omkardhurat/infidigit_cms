@@ -14,6 +14,18 @@ router.get('/get', async function(req, res, next) {
   
 });
 
+router.get('/getClients', async function(req, res, next) {
+  let connection = await createConnection();
+  let selectQuery = `Select * from client`;
+  connection.query(selectQuery, function (err, result, fields) {
+    if (err) {
+      res.status(500).json({status: 500, message: 'Something Went wrong. Please contact administrator'});
+    }
+    res.status(200).json({ status: 200, users: result});
+  });
+  
+});
+
 let validateuser = async (user) => {
   if(user.name == undefined || user.name == null || user.name == ''){
     return false;
@@ -48,7 +60,7 @@ router.post('/add', async function(req, res, next) {
       }
     });
   }else{
-    res.status(400).send('Please enter valid data to add channel');
+    res.status(400).send('Please enter valid data to add User');
   }
   
 });

@@ -39,33 +39,45 @@ router.post('/authenticate', async function(req, res, next) {
 
 router.get('/dashboard', function(req, res, next) {
   
-  res.render('dashboard/userDashboard', { title: 'CMS Application', session: global.userSession });
+  res.render('dashboard/userDashboard', { title: 'Dashboard', session: global.userSession });
 
 });
 
 router.get('/channel', function(req, res, next) {
-  res.render('user/channel', { title: 'CMS Application' , session: global.userSession});
+  res.render('user/channel', { title: 'Channel' , session: global.userSession});
 
 });
 
 router.get('/network', function(req, res, next) {
-  res.render('user/network', { title: 'CMS Application', session: global.userSession });
+  res.render('user/network', { title: 'Network', session: global.userSession });
 
 });
 
 router.get('/campaign', function(req, res, next) {
-  res.render('user/compaign', { title: 'CMS Application', session: global.userSession });
+  res.render('user/compaign', { title: 'Compaign', session: global.userSession });
 
 });
 
 router.get('/dashboard', function(req, res, next) {
-  res.render('dashboard/userDashboard', { title: 'CMS Application' , session: global.userSession});
+  res.render('dashboard/userDashboard', { title: 'Dashboard' , session: global.userSession});
 
 });
 
 router.get('/user', function(req, res, next) {
   console.log(JSON.stringify(global.userSession));
-  res.render('admin/user', { title: 'CMS Application', session: global.userSession });
+  res.render('admin/user', { title: 'User Management', session: global.userSession });
+
+});
+
+router.get('/client', function(req, res, next) {
+  console.log(JSON.stringify(global.userSession));
+  res.render('admin/client', { title: 'Client Management', session: global.userSession });
+
+});
+
+router.get('/logout', function(req, res, next) {
+  req.session.user = null;
+  res.redirect('/')
 
 });
 
