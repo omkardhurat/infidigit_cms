@@ -28,6 +28,7 @@
         </a>
        
       </li>
+      <% if (session.userType == 'admin' || session.userType == 'user') { %>
       <li>
         <a href="/channel">
           <i class='bx bx-tv' ></i>
@@ -51,6 +52,7 @@
         </a>
        
       </li>
+      <% } %>
       <% if (session.userType == 'admin') { %>
       <li>
         <a href="/user">
