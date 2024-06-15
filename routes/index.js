@@ -58,7 +58,7 @@ router.get('/network', isLoggedIn, function(req, res, next) {
 
 });
 
-router.get('/campaign', isLoggedIn, function(req, res, next) {
+router.get('/compaign', isLoggedIn, function(req, res, next) {
   res.render('user/compaign', { title: 'Compaign', session: global.userSession });
 
 });

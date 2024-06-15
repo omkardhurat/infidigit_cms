@@ -48,8 +48,11 @@ router.get('/getByNetwork', isLoggedIn, async function(req, res, next) {
 
   try{
     let network = req.query.network;
-    let countQuery = `SELECT * FROM CHANNEL`
-    let [result] = await connection.query(countQuery);
+    let chanQry = `SELECT channels FROM network where id=${network}`;
+    let [channels] = await connection.query(chanQry);
+    console.log(JSON.stringify(channels));
+    let channelQry = `select * from channel where id in (${channels[0].channels})`
+    let [result] = await connection.query(channelQry);
     res.status(200).json({ status: 200, channels: result});
   }catch(error){
     console.log(error);
