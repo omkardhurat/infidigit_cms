@@ -1,5 +1,5 @@
 var express = require('express');
-
+var moment = require('moment');
 const { createConnection } = require("../database/dbConnect");
 const { isNullOrEmpty } = require('../constants/validators');
 const { isLoggedIn } = require('./middleware');
@@ -50,6 +50,8 @@ let validateCompaign = async (compaign) => {
         return false;
     }else if(compaign.endDate == undefined || compaign.endDate == null || compaign.endDate == ''){
         return false;
+    }else if(compaign.time == undefined || compaign.time == null || compaign.time == ''){
+      return false;
     }else if(compaign.slotType == undefined || compaign.slotType == null || compaign.slotType == ''){
         return false;
     }else{
@@ -68,9 +70,18 @@ let validateCompaign = async (compaign) => {
       console.log(compaign.channels);
 
       try{
-        let insertQuery = `INSERT INTO compaign(name, state, city, network, channels, product, brand, start_date, end_date, slot_type) values ('${compaign.name}', ${compaign.state}, ${compaign.city}, ${compaign.network}, '${compaign.channels}', '${compaign.product}', '${compaign.brand}', '${compaign.startDate}', '${compaign.endDate}', '${compaign.slotType}')`;
-        let [result] = await connection.query(insertQuery);
-        res.status(200).json({ status: 200, message: 'Compaign Added Succussfully'});
+        var startDate = moment(compaign.startDate);
+        var endDate = moment(compaign.endDate);
+
+        const diffDays = endDate.diff(startDate);
+        if(diffDays <= 0 ){
+          res.status(400).send('End Date must be after Start Date');
+        }else{
+          let insertQuery = `INSERT INTO compaign(name, state, city, network, channels, product, brand, start_date, end_date, slot_type) values ('${compaign.name}', ${compaign.state}, ${compaign.city}, ${compaign.network}, '${compaign.channels}', '${compaign.product}', '${compaign.brand}', '${compaign.startDate}', '${compaign.endDate}', '${compaign.slotType}')`;
+          let [result] = await connection.query(insertQuery);
+          res.status(200).json({ status: 200, message: 'Compaign Added Succussfully'});
+        }
+        
       }catch(error){
         console.log(error);
         res.status(500).json({status: 500, message: 'Something Went wrong. Please contact administrator'});  
