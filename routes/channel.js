@@ -1,10 +1,11 @@
 var express = require('express');
 
 const { createConnection } = require("../database/dbConnect");
-const { isNullOrEmpty } = require('../constants/validators')
+const { isNullOrEmpty } = require('../constants/validators');
+const { isLoggedIn } = require('./middleware');
 var router = express.Router();
 
-router.get('/get', async function(req, res, next) {
+router.get('/get', isLoggedIn, async function(req, res, next) {
     let connection = await createConnection();
     try{
       let countQuery = `SELECT CH.id, CH.name, CH.created_at, CH.updated_at, S.NAME AS state, C.NAME AS city FROM CHANNEL CH 
@@ -25,7 +26,7 @@ router.get('/get', async function(req, res, next) {
 });
 
 
-router.get('/getByCity', async function(req, res, next) {
+router.get('/getByCity', isLoggedIn, async function(req, res, next) {
   let connection = await createConnection();
 
   try{
@@ -41,7 +42,7 @@ router.get('/getByCity', async function(req, res, next) {
   }
 });
 
-router.get('/getByNetwork', async function(req, res, next) {
+router.get('/getByNetwork', isLoggedIn, async function(req, res, next) {
   let connection = await createConnection();
   
 
@@ -73,7 +74,7 @@ let validateChannel = async (channel) => {
   }
 }
 
-router.post('/add', async function(req, res, next) {
+router.post('/add', isLoggedIn, async function(req, res, next) {
   let connection = await createConnection();
   let channel = req.body;
   let validateData = await validateChannel(channel);

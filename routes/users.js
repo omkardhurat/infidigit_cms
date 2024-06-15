@@ -1,8 +1,9 @@
 var express = require('express');
 const { createConnection } = require("../database/dbConnect");
+const { isLoggedIn } = require('./middleware');
 var router = express.Router();
 
-router.get('/get', async function(req, res, next) {
+router.get('/get', isLoggedIn, async function(req, res, next) {
   let connection = await createConnection();
   try{
     const [results] = await connection.query('SELECT * FROM user');
@@ -17,7 +18,7 @@ router.get('/get', async function(req, res, next) {
   
 });
 
-router.get('/getClients', async function(req, res, next) {
+router.get('/getClients', isLoggedIn, async function(req, res, next) {
   let connection = await createConnection();
   try{
     const [results] = await connection.query(`SELECT * FROM user where userType='client'`);
@@ -45,7 +46,7 @@ let validateuser = async (user) => {
   }
 }
 
-router.post('/add', async function(req, res, next) {
+router.post('/add', isLoggedIn, async function(req, res, next) {
   let connection = await createConnection();
   let user = req.body;
   let validateData = await validateuser(user);
@@ -104,7 +105,7 @@ let insertUser = async (user, connection) => {
   
 }
 
-router.post('/addClient', async function(req, res, next) {
+router.post('/addClient', isLoggedIn, async function(req, res, next) {
   let connection = await createConnection();
   let user = req.body;
   let validateData = await validateClient(user);
@@ -124,33 +125,6 @@ router.post('/addClient', async function(req, res, next) {
 
       await connection.query('COMMIT');
       res.status(200).json({ status: 200, message: 'Client Added Succussfully'});
-      // let insertUserQry = `INSERT INTO user(name, userType, username, password) values ('${user.name}', 'client', '${user.username}', '${user.password}')`
-      // let userId = await connection.query(insertUserQry, function(err, result){
-      //     if (err) {
-      //       if(err && err.sqlMessage && err.sqlMessage.includes('Duplicate entry')){
-      //           res.status(400).send('Username already exists');
-      //         }else{
-      //           res.status(500).json({status: 500, message: 'Something Went wrong. Please contact administrator'});
-      //         }
-      //     }else{
-      //       return result;
-      //     }
-      // });
-      // console.log(JSON.stringify(userId));
-      
-      // let insertQuery = `INSERT INTO user(name, state, city, address, userId, username, password) values ('${user.name}', ${user.state}, ${user.city}, '${user.address}', ${userId}, '${user.username}', '${user.password}')`;
-      // connection.query(insertQuery, function (err, result, fields) {
-      //   if (err) {
-      //     console.log(err.sqlMessage);
-      //     if(err.sqlMessage.includes('Duplicate entry')){
-      //       res.status(400).send('Username already exists');
-      //     }else{
-      //       res.status(500).json({status: 500, message: 'Something Went wrong. Please contact administrator'});
-      //     }
-      //   }else{
-      //     res.status(200).json({ status: 200, message: 'User Added Succussfully'});
-      //   }
-      // });
     }catch(error){
       console.log(error);
       await connection.query('ROLLBACK');

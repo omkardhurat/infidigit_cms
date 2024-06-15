@@ -1,9 +1,10 @@
 var express = require('express');
 
 const { createConnection } = require("../database/dbConnect");
+const { isLoggedIn } = require('./middleware');
 var router = express.Router();
 
-router.get('/states', async function(req, res, next) {
+router.get('/states', isLoggedIn, async function(req, res, next) {
     let connection = await createConnection();
     try{
       let countQuery = `SELECT * FROM STATE`;
@@ -18,7 +19,7 @@ router.get('/states', async function(req, res, next) {
     
 });
 
-router.get('/cities/:stateId', async function(req, res, next) {
+router.get('/cities/:stateId', isLoggedIn,async function(req, res, next) {
   let connection = await createConnection();
   try{
     let stateId = req.params.stateId;

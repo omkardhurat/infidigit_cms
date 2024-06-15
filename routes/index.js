@@ -1,6 +1,7 @@
 var express = require('express');
 
 const { createConnection } = require("../database/dbConnect");
+const { isLoggedIn } = require('./middleware');
 var router = express.Router();
 
 
@@ -41,39 +42,39 @@ router.post('/authenticate', async function(req, res, next) {
 
 });
 
-router.get('/dashboard', function(req, res, next) {
+router.get('/dashboard', isLoggedIn, function(req, res, next) {
   
   res.render('dashboard/userDashboard', { title: 'Dashboard', session: global.userSession });
 
 });
 
-router.get('/channel', function(req, res, next) {
+router.get('/channel', isLoggedIn, function(req, res, next) {
   res.render('user/channel', { title: 'Channel' , session: global.userSession});
 
 });
 
-router.get('/network', function(req, res, next) {
+router.get('/network', isLoggedIn, function(req, res, next) {
   res.render('user/network', { title: 'Network', session: global.userSession });
 
 });
 
-router.get('/campaign', function(req, res, next) {
+router.get('/campaign', isLoggedIn, function(req, res, next) {
   res.render('user/compaign', { title: 'Compaign', session: global.userSession });
 
 });
 
-router.get('/dashboard', function(req, res, next) {
+router.get('/dashboard', isLoggedIn,function(req, res, next) {
   res.render('dashboard/userDashboard', { title: 'Dashboard' , session: global.userSession});
 
 });
 
-router.get('/user', function(req, res, next) {
+router.get('/user', isLoggedIn, function(req, res, next) {
   console.log(JSON.stringify(global.userSession));
   res.render('admin/user', { title: 'User Management', session: global.userSession });
 
 });
 
-router.get('/client', function(req, res, next) {
+router.get('/client', isLoggedIn, function(req, res, next) {
   console.log(JSON.stringify(global.userSession));
   res.render('admin/client', { title: 'Client Management', session: global.userSession });
 
