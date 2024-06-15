@@ -1,7 +1,8 @@
-var mysql = require('mysql2');
+// var mysql = require('mysql2');
+var mysql = require('mysql2/promise');
 
 async function createConnection(){
-    const connection = await mysql.createConnection({
+    const connection = await mysql.createPool({
         host: 'localhost',
         user: 'root',
         password: 'cms@#123',

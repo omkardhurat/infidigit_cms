@@ -6,45 +6,57 @@ var router = express.Router();
 
 router.get('/get', async function(req, res, next) {
     let connection = await createConnection();
-    let countQuery = `SELECT CH.id, CH.name, CH.created_at, CH.updated_at, S.NAME AS state, C.NAME AS city FROM CHANNEL CH 
-    INNER JOIN STATE S 
-    ON S.ID = CH.STATE
-    INNER JOIN CITY C
-    ON C.ID = CH.CITY`
-    connection.query(countQuery, function (err, result, fields) {
-      if (err) {
-        res.status(500).json({status: 500, message: 'Something Went wrong. Please contact administrator'});
-      }
+    try{
+      let countQuery = `SELECT CH.id, CH.name, CH.created_at, CH.updated_at, S.NAME AS state, C.NAME AS city FROM CHANNEL CH 
+        INNER JOIN STATE S 
+        ON S.ID = CH.STATE
+        INNER JOIN CITY C
+        ON C.ID = CH.CITY`;
+      let [result] = await connection.query(countQuery);
       res.status(200).json({ status: 200, channels: result});
-    });
+    }catch(error){
+      console.log(error);
+      res.status(500).json({status: 500, message: 'Something Went wrong. Please contact administrator'});  
+    }finally{
+      await connection.end();
+    }
+    
     
 });
 
 
 router.get('/getByCity', async function(req, res, next) {
   let connection = await createConnection();
-  let city = req.query.city;
-  let countQuery = `SELECT * FROM CHANNEL where city = ${city}`
-  connection.query(countQuery, function (err, result, fields) {
-    if (err) {
-      res.status(500).json({status: 500, message: 'Something Went wrong. Please contact administrator'});
-    }
+
+  try{
+    let city = req.query.city;
+    let countQuery = `SELECT * FROM CHANNEL where city = ${city}`
+    let [result] = await connection.query(countQuery);
     res.status(200).json({ status: 200, channels: result});
-  });
-  
+  }catch(error){
+    console.log(error);
+    res.status(500).json({status: 500, message: 'Something Went wrong. Please contact administrator'});  
+  }finally{
+    await connection.end();
+  }
 });
 
 router.get('/getByNetwork', async function(req, res, next) {
   let connection = await createConnection();
-  let network = req.query.network;
-  let countQuery = `SELECT * FROM CHANNEL`
-  connection.query(countQuery, function (err, result, fields) {
-    if (err) {
-      res.status(500).json({status: 500, message: 'Something Went wrong. Please contact administrator'});
-    }
-    res.status(200).json({ status: 200, channels: result});
-  });
   
+
+  try{
+    let network = req.query.network;
+    let countQuery = `SELECT * FROM CHANNEL`
+    let [result] = await connection.query(countQuery);
+    res.status(200).json({ status: 200, channels: result});
+  }catch(error){
+    console.log(error);
+    res.status(500).json({status: 500, message: 'Something Went wrong. Please contact administrator'});  
+  }finally{
+    await connection.end();
+  }
+
 });
 
 let validateChannel = async (channel) => {
@@ -67,13 +79,16 @@ router.post('/add', async function(req, res, next) {
   let validateData = await validateChannel(channel);
   console.log(validateData);
   if(validateData){
-    let insertQuery = `INSERT INTO CHANNEL(name, state, city, producer) values ('${channel.name}', ${channel.state}, ${channel.city}, '${channel.producer}')`;
-    connection.query(insertQuery, function (err, result, fields) {
-      if (err) {
-        res.status(500).json({status: 500, message: 'Something Went wrong. Please contact administrator'});
-      }
+    try{
+      let insertQuery = `INSERT INTO CHANNEL(name, state, city, producer) values ('${channel.name}', ${channel.state}, ${channel.city}, '${channel.producer}')`;
+      let [result] = await connection.query(insertQuery);
       res.status(200).json({ status: 200, message: 'Channel Added Succussfully'});
-    });
+    }catch(error){
+      console.log(error);
+      res.status(500).json({status: 500, message: 'Something Went wrong. Please contact administrator'});  
+    }finally{
+      await connection.end();
+    }
   }else{
     res.status(400).send('Please enter valid data to add channel');
   }

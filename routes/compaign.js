@@ -5,22 +5,26 @@ const { isNullOrEmpty } = require('../constants/validators')
 var router = express.Router();
 
 router.get('/get', async function(req, res, next) {
-    let connection = await createConnection();
-    let countQuery = `SELECT com.id, com.name, com.created_at, com.updated_at, S.NAME AS state, C.NAME AS city, N.NAME AS network 
+
+  let connection = await createConnection();
+  try{
+    const [results] = await connection.query(`SELECT com.id, com.name, com.created_at, com.updated_at, S.NAME AS state, C.NAME AS city, N.NAME AS network 
     FROM COMPAIGN COM
       INNER JOIN STATE S 
       ON S.ID = com.STATE
       INNER JOIN CITY C
       ON C.ID = com.CITY
       INNER JOIN NETWORK N
-      ON N.ID = com.NETWORK`
-    connection.query(countQuery, function (err, result, fields) {
-      if (err) {
-        res.status(500).json({status: 500, message: 'Something Went wrong. Please contact administrator'});
-      }else{
-        res.status(200).json({ status: 200, compaigns: result});
-      }
-    });
+      ON N.ID = com.NETWORK`);
+    console.log('Results:', results);
+    res.status(200).json({ status: 200, compaigns: results});
+  }catch(error){
+    console.log(error);
+    res.status(500).json({status: 500, message: 'Something Went wrong. Please contact administrator'});  
+  }finally{
+    await connection.end();
+  }
+   
     
 });
 
@@ -59,17 +63,20 @@ let validateCompaign = async (compaign) => {
     let validateData = await validateCompaign(compaign);
     console.log(validateData);
     if(validateData){
-    compaign.channels = compaign.channels.join(",");
-    console.log(compaign.channels);
-      let insertQuery = `INSERT INTO compaign(name, state, city, network, channels, product, brand, start_date, end_date, slot_type) values ('${compaign.name}', ${compaign.state}, ${compaign.city}, ${compaign.network}, '${compaign.channels}', '${compaign.product}', '${compaign.brand}', '${compaign.startDate}', '${compaign.endDate}', '${compaign.slotType}')`;
-      connection.query(insertQuery, function (err, result, fields) {
-        if (err) {
-        console.log(err);
-          res.status(500).json({status: 500, message: 'Something Went wrong. Please contact administrator'});
-        }else{
-            res.status(200).json({ status: 200, message: 'Compaign Added Succussfully'});
-        }
-      });
+      compaign.channels = compaign.channels.join(",");
+      console.log(compaign.channels);
+
+      try{
+        let insertQuery = `INSERT INTO compaign(name, state, city, network, channels, product, brand, start_date, end_date, slot_type) values ('${compaign.name}', ${compaign.state}, ${compaign.city}, ${compaign.network}, '${compaign.channels}', '${compaign.product}', '${compaign.brand}', '${compaign.startDate}', '${compaign.endDate}', '${compaign.slotType}')`;
+        let [result] = await connection.query(insertQuery);
+        res.status(200).json({ status: 200, message: 'Compaign Added Succussfully'});
+      }catch(error){
+        console.log(error);
+        res.status(500).json({status: 500, message: 'Something Went wrong. Please contact administrator'});  
+      }finally{
+        await connection.end();
+      }
+
     }else{
       res.status(400).send('Please enter valid data to add Compaign');
     }

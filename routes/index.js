@@ -21,11 +21,10 @@ router.post('/authenticate', async function(req, res, next) {
   let password = reqBody.password;
 
   let connection = await createConnection();
-  let sqlQuery = `SELECT * FROM USER WHERE username='${username}' AND PASSWORD='${password}'`
-  connection.query(sqlQuery, function (err, result, fields) {
-    if (err) {
-      res.render('login', { title: 'CMS Application', error: error });
-    };
+
+  try{
+    let insertQuery = `SELECT * FROM USER WHERE username='${username}' AND PASSWORD='${password}'`;
+    let [result] = await connection.query(insertQuery);
     if(result.length == 1){
       req.session.user = result[0]
       global.userSession = result[0];
@@ -33,8 +32,13 @@ router.post('/authenticate', async function(req, res, next) {
     }else{
       res.redirect(`/?error=Invalid Credentials`);
     }
-    console.log(result);
-  });
+  }catch(error){
+    console.log(error);
+    res.redirect(`/?error=Invalid Credentials`);
+  }finally{
+    await connection.end();
+  }
+
 });
 
 router.get('/dashboard', function(req, res, next) {

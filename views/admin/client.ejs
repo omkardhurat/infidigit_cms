@@ -153,13 +153,15 @@ function loadCities(stateId){
   
     let reqBody = {
         name: $('#name').val(),
-        userType: $('#userType').val(),
+        state: $('#stateSelect').val(),
+        city: $('#citySelect').val(),
+        address: $('#address').val(),
         username: $('#username').val(),
         password: $('#userPassword').val()
     }
     $.ajax({
         type : "POST",
-        url : "http://localhost:3000/users/add",
+        url : "http://localhost:3000/users/addClient",
         data: reqBody,
         success: function(data){
             console.log(JSON.stringify(data));

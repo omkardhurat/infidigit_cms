@@ -6,32 +6,40 @@ var router = express.Router();
 
 router.get('/get', async function(req, res, next) {
     let connection = await createConnection();
-    let countQuery = `SELECT N.id, N.name, N.created_at, N.updated_at, S.NAME AS state, C.NAME AS city
-    FROM NETWORK N 
+
+    try{
+      let countQuery = `SELECT N.id, N.name, N.created_at, N.updated_at, S.NAME AS state, C.NAME AS city
+      FROM NETWORK N 
       INNER JOIN STATE S 
       ON S.ID = N.STATE
       INNER JOIN CITY C
-      ON C.ID = N.CITY`
-    connection.query(countQuery, function (err, result, fields) {
-      if (err) {
-        res.status(500).json({status: 500, message: 'Something Went wrong. Please contact administrator'});
-      }else{
-        res.status(200).json({ status: 200, networks: result});
-      }
-    });
+      ON C.ID = N.CITY`;
+      let [result] = await connection.query(countQuery);
+      res.status(200).json({ status: 200, networks: result});
+    }catch(error){
+      console.log(error);
+      res.status(500).json({status: 500, message: 'Something Went wrong. Please contact administrator'});  
+    }finally{
+      await connection.end();
+    }
+
     
 });
 
 router.get('/getByCity', async function(req, res, next) {
   let connection = await createConnection();
-  let city = req.query.city;
-  let countQuery = `SELECT * FROM NETWORK where city = ${city}`
-  connection.query(countQuery, function (err, result, fields) {
-    if (err) {
-      res.status(500).json({status: 500, message: 'Something Went wrong. Please contact administrator'});
+
+  try{
+    let city = req.query.city;
+    let countQuery = `SELECT * FROM NETWORK where city = ${city}`
+      let [result] = await connection.query(countQuery);
+      res.status(200).json({ status: 200, networks: result});
+    }catch(error){
+      console.log(error);
+      res.status(500).json({status: 500, message: 'Something Went wrong. Please contact administrator'});  
+    }finally{
+      await connection.end();
     }
-    res.status(200).json({ status: 200, networks: result});
-  });
   
 });
 
@@ -56,17 +64,19 @@ let validateNetwork = async (network) => {
     let validateData = await validateNetwork(network);
     console.log(validateData);
     if(validateData){
-    network.channels = network.channels.join(",");
-    console.log(network.channels);
-      let insertQuery = `INSERT INTO NETWORK(name, state, city, channels) values ('${network.name}', ${network.state}, ${network.city}, '${network.channels}')`;
-      connection.query(insertQuery, function (err, result, fields) {
-        if (err) {
-        console.log(err);
-          res.status(500).json({status: 500, message: 'Something Went wrong. Please contact administrator'});
-        }else{
-            res.status(200).json({ status: 200, message: 'Network Added Succussfully'});
-        }
-      });
+      try{
+        network.channels = network.channels.join(",");
+        console.log(network.channels);
+        let insertQuery = `INSERT INTO NETWORK(name, state, city, channels) values ('${network.name}', ${network.state}, ${network.city}, '${network.channels}')`;
+        let [result] = await connection.query(insertQuery);
+        res.status(200).json({ status: 200, message: 'Network Added Succussfully'});
+      }catch(error){
+        console.log(error);
+        res.status(500).json({status: 500, message: 'Something Went wrong. Please contact administrator'});  
+      }finally{
+        await connection.end();
+      }
+    
     }else{
       res.status(400).send('Please enter valid data to add Network');
     }
