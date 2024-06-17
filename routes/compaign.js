@@ -52,16 +52,39 @@ let validateCompaign = async (compaign) => {
         return false;
     }else if(compaign.time == undefined || compaign.time == null || compaign.time == ''){
       return false;
+    }else if(compaign.slotCount == undefined || compaign.slotCount == null || compaign.slotCount == ''){
+      return false;
     }else if(compaign.slotType == undefined || compaign.slotType == null || compaign.slotType == ''){
         return false;
     }else{
       return true;
     }
   }
+
+  let generateSlots = async (compaign) => {
+    // const dayStart = new Date(0, 0, 0); // Start of the day (midnight)
+    // const dayEnd = new Date(23, 59, 59, 999); // End of the day
+    let slotDuration = compaign.slotDuration;
+    slotDuration = slotDuration * 1000; // slotDuration seconds in milliseconds
+    let compaignTime = compaign.time.split('-');
+    let totalHoues = parseInt(compaignTime[1]) - parseInt(compaignTime[0])
+    console.log(JSON.stringify(compaignTime) + ' - ' + totalHoues);
+    const gapDuration = 30 * 60 * 1000; // 1 hour in milliseconds
+
+    let startDate = new Date(compaign.startDate);
+    let endDate = new Date(compaign.endDate);
+    let slots = [];
+    console.log(`${startDate} - ${endDate} - ${slotDuration} - ${gapDuration}`);
+    for (startDate; startDate <= endDate; startDate.setDate(startDate.getDate() + 1)) {
+      console.log('Current Date:', startDate);
+      
+    }
+  }
   
   router.post('/add', isLoggedIn, async function(req, res, next) {
     let connection = await createConnection();
     let compaign = req.body;
+    let slots = await generateSlots(compaign);
     console.log(JSON.stringify(compaign));
     let validateData = await validateCompaign(compaign);
     console.log(validateData);
@@ -74,9 +97,11 @@ let validateCompaign = async (compaign) => {
         var endDate = moment(compaign.endDate);
 
         const diffDays = endDate.diff(startDate);
+
         if(diffDays <= 0 ){
           res.status(400).send('End Date must be after Start Date');
         }else{
+          let slots = await generateSlots(compaign);
           let insertQuery = `INSERT INTO compaign(name, state, city, network, channels, product, brand, start_date, end_date, slot_type) values ('${compaign.name}', ${compaign.state}, ${compaign.city}, ${compaign.network}, '${compaign.channels}', '${compaign.product}', '${compaign.brand}', '${compaign.startDate}', '${compaign.endDate}', '${compaign.slotType}')`;
           let [result] = await connection.query(insertQuery);
           res.status(200).json({ status: 200, message: 'Compaign Added Succussfully'});
