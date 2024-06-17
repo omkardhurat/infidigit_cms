@@ -65,20 +65,61 @@ let validateCompaign = async (compaign) => {
     // const dayStart = new Date(0, 0, 0); // Start of the day (midnight)
     // const dayEnd = new Date(23, 59, 59, 999); // End of the day
     let slotDuration = compaign.slotDuration;
+    let slotCount = compaign.slotCount;
     slotDuration = slotDuration * 1000; // slotDuration seconds in milliseconds
     let compaignTime = compaign.time.split('-');
-    let totalHoues = parseInt(compaignTime[1]) - parseInt(compaignTime[0])
-    console.log(JSON.stringify(compaignTime) + ' - ' + totalHoues);
-    const gapDuration = 30 * 60 * 1000; // 1 hour in milliseconds
+    let totalHours = parseInt(compaignTime[1]) - parseInt(compaignTime[0])
+    console.log(JSON.stringify(compaignTime) + ' - ' + totalHours);
+    let gapMinutes = ((totalHours - 1) * 60)/slotCount;
+    const gapDuration = gapMinutes * 60 * 1000; // 1 hour in milliseconds
 
     let startDate = new Date(compaign.startDate);
     let endDate = new Date(compaign.endDate);
     let slots = [];
+    const usedNumbers = [];
+    let dateIndex = 0;
     console.log(`${startDate} - ${endDate} - ${slotDuration} - ${gapDuration}`);
     for (startDate; startDate <= endDate; startDate.setDate(startDate.getDate() + 1)) {
       console.log('Current Date:', startDate);
+      const startTime = moment().startOf('day').add(8, 'hours'); // Start at 6 AM
+      const endTime = moment().endOf('day').subtract(1, 'hours'); // End at 6 PM (excluding the last 6 hours)
+      let index = 0;
+      let randomNumber;
+      do {
+        randomNumber = getRandomNumber(usedNumbers);
+      } while (usedNumbers.includes(randomNumber)); // Ensure non-repeating number
+    
+      usedNumbers.push(randomNumber);
+      dateIndex++;
+      let currentSlot = startTime.add((randomNumber * 60 * 1000), 'milliseconds');
+      
+      // console.log(randomNumber);
+      while (currentSlot.isBefore(endTime)) {
+        slots.push({
+          date: moment(startDate).format("DD-MM-YYYY"),
+          startTime: currentSlot.format('HH:mm:ss.SSS'), // Timestamp with milliseconds
+          endTime: currentSlot.add(slotDuration).format('HH:mm:ss.SSS')
+        });
+        index++;
+        // console.log(index);
+        
+        currentSlot = currentSlot.add(slotDuration + (gapDuration));
+      }
       
     }
+    console.log(JSON.stringify(slots));
+  }
+
+  function getRandomNumber(usedNumbers) {
+    const availableNumbers = [];
+    for (let i = 1; i <= 20; i++) {
+      if (!usedNumbers.includes(i)) {
+        availableNumbers.push(i);
+      }
+    }
+  
+    const randomIndex = Math.floor(Math.random() * availableNumbers.length);
+    return availableNumbers[randomIndex];
   }
   
   router.post('/add', isLoggedIn, async function(req, res, next) {
