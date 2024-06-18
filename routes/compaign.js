@@ -64,55 +64,66 @@ let validateCompaign = async (compaign) => {
   let generateSlots = async (compaign) => {
     // const dayStart = new Date(0, 0, 0); // Start of the day (midnight)
     // const dayEnd = new Date(23, 59, 59, 999); // End of the day
-    let slotDuration = compaign.slotDuration;
-    let slotCount = compaign.slotCount;
-    slotDuration = slotDuration * 1000; // slotDuration seconds in milliseconds
-    let compaignTime = compaign.time.split('-');
-    let totalHours = parseInt(compaignTime[1]) - parseInt(compaignTime[0])
-    console.log(JSON.stringify(compaignTime) + ' - ' + totalHours);
-    let gapMinutes = ((totalHours - 1) * 60)/slotCount;
-    const gapDuration = gapMinutes * 60 * 1000; // 1 hour in milliseconds
-
-    let startDate = new Date(compaign.startDate);
-    let endDate = new Date(compaign.endDate);
-    let slots = [];
-    const usedNumbers = [];
-    let dateIndex = 0;
-    console.log(`${startDate} - ${endDate} - ${slotDuration} - ${gapDuration}`);
-    for (startDate; startDate <= endDate; startDate.setDate(startDate.getDate() + 1)) {
-      console.log('Current Date:', startDate);
-      const startTime = moment().startOf('day').add(8, 'hours'); // Start at 6 AM
-      const endTime = moment().endOf('day').subtract(1, 'hours'); // End at 6 PM (excluding the last 6 hours)
-      let index = 0;
-      let randomNumber;
-      do {
-        randomNumber = getRandomNumber(usedNumbers);
-      } while (usedNumbers.includes(randomNumber)); // Ensure non-repeating number
-    
-      usedNumbers.push(randomNumber);
-      dateIndex++;
-      let currentSlot = startTime.add((randomNumber * 60 * 1000), 'milliseconds');
-      
-      // console.log(randomNumber);
-      while (currentSlot.isBefore(endTime)) {
-        slots.push({
-          date: moment(startDate).format("DD-MM-YYYY"),
-          startTime: currentSlot.format('HH:mm:ss.SSS'), // Timestamp with milliseconds
-          endTime: currentSlot.add(slotDuration).format('HH:mm:ss.SSS')
-        });
-        index++;
-        // console.log(index);
+    try{
+      let slotDuration = compaign.slotDuration;
+      let slotCount = compaign.slotCount;
+      slotDuration = slotDuration * 1000; // slotDuration seconds in milliseconds
+      let compaignTime = compaign.time.split('-');
+      let totalHours = parseInt(compaignTime[1]) - parseInt(compaignTime[0])
+      console.log(JSON.stringify(compaignTime) + ' - ' + totalHours);
+      let gapMinutes = ((totalHours - 1) * 60)/slotCount;
+      const gapDuration = gapMinutes * 60 * 1000; // 1 hour in milliseconds
+  
+      let startDate = new Date(compaign.startDate);
+      let endDate = new Date(compaign.endDate);
+      let slots = [];
+      let slotInsertValues = [];
+      const usedNumbers = [];
+      let dateIndex = 0;
+      console.log(`${startDate} - ${endDate} - ${slotDuration} - ${gapDuration}`);
+      for (startDate; startDate <= endDate; startDate.setDate(startDate.getDate() + 1)) {
+        console.log('Current Date:', startDate);
+        const startTime = moment().startOf('day').add(8, 'hours'); // Start at 6 AM
+        const endTime = moment().endOf('day').subtract(1, 'hours'); // End at 6 PM (excluding the last 6 hours)
+        let index = 0;
+        let randomNumber;
+        do {
+          randomNumber = getRandomNumber(usedNumbers);
+        } while (usedNumbers.includes(randomNumber)); // Ensure non-repeating number
+        console.log("Ramndom Numner"+randomNumber);
+        usedNumbers.push(randomNumber);
+        dateIndex++;
+        console.log(dateIndex);
+        let currentSlot = startTime.add((randomNumber * 60 * 1000), 'milliseconds');
         
-        currentSlot = currentSlot.add(slotDuration + (gapDuration));
+        // console.log(randomNumber);
+        while (currentSlot.isBefore(endTime)) {
+          slots.push({
+            compaignId: compaign.compaignId,
+            date: moment(startDate).format("DD-MM-YYYY"),
+            start_time: currentSlot.format('HH:mm:ss.SSS'), // Timestamp with milliseconds
+            end_time: currentSlot.add(slotDuration).format('HH:mm:ss.SSS')
+          });
+          slotInsertValues.push(`('${currentSlot.format('HH:mm:ss.SSS')}', '${currentSlot.add(slotDuration).format('HH:mm:ss.SSS')}', ${compaign.compaignId}, '${new Date(startDate).toISOString().slice(0, 19).replace('T', ' ')}')`)
+          index++;
+          console.log(index);
+          
+          currentSlot = currentSlot.add(slotDuration + (gapDuration));
+        }
+        
       }
-      
+      // console.log(JSON.stringify(slots));
+      return slotInsertValues;
+    }catch(error){
+      console.log(error);
+      throw error;
     }
-    console.log(JSON.stringify(slots));
+    
   }
 
   function getRandomNumber(usedNumbers) {
     const availableNumbers = [];
-    for (let i = 1; i <= 20; i++) {
+    for (let i = 1; i <= 30; i++) {
       if (!usedNumbers.includes(i)) {
         availableNumbers.push(i);
       }
@@ -125,7 +136,6 @@ let validateCompaign = async (compaign) => {
   router.post('/add', isLoggedIn, async function(req, res, next) {
     let connection = await createConnection();
     let compaign = req.body;
-    let slots = await generateSlots(compaign);
     console.log(JSON.stringify(compaign));
     let validateData = await validateCompaign(compaign);
     console.log(validateData);
@@ -134,6 +144,7 @@ let validateCompaign = async (compaign) => {
       console.log(compaign.channels);
 
       try{
+        await connection.query('START TRANSACTION');
         var startDate = moment(compaign.startDate);
         var endDate = moment(compaign.endDate);
 
@@ -142,13 +153,24 @@ let validateCompaign = async (compaign) => {
         if(diffDays <= 0 ){
           res.status(400).send('End Date must be after Start Date');
         }else{
-          let slots = await generateSlots(compaign);
           let insertQuery = `INSERT INTO compaign(name, state, city, network, channels, product, brand, start_date, end_date, slot_type) values ('${compaign.name}', ${compaign.state}, ${compaign.city}, ${compaign.network}, '${compaign.channels}', '${compaign.product}', '${compaign.brand}', '${compaign.startDate}', '${compaign.endDate}', '${compaign.slotType}')`;
           let [result] = await connection.query(insertQuery);
+          
+          let lastIdQuery = `SELECT id from compaign order BY id DESC LIMIT 1`;
+          let compaignId = await connection.query(lastIdQuery);
+          console.log("JSON::"+JSON.stringify(compaignId[0][0]));
+          compaign.compaignId = compaignId[0][0].id;
+          
+          let slots = await generateSlots(compaign);
+          let slotInsertQry = `INSERT INTO SLOTS (start_time, end_time, compaignId, date) values ${slots.join(',')}`
+          let [slotResp] = await connection.query(slotInsertQry);
+          console.log(slotInsertQry);
+          await connection.query('COMMIT');
           res.status(200).json({ status: 200, message: 'Compaign Added Succussfully'});
         }
         
       }catch(error){
+        await connection.query('ROLLBACK');
         console.log(error);
         res.status(500).json({status: 500, message: 'Something Went wrong. Please contact administrator'});  
       }finally{
