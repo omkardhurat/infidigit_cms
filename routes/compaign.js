@@ -61,57 +61,92 @@ let validateCompaign = async (compaign) => {
     }
   }
 
-  let generateSlots = async (compaign) => {
+  let fetchExistingSlots = async (compaign, slotDate, connection) => {
+    let slotFetchQuery = `SELECT start_time, end_time FROM cms_app.slots where date = '${moment(slotDate).format("YYYY-MM-DD")}';`
+    let [existSlotsData] = await connection.query(slotFetchQuery);
+    console.log(JSON.stringify(existSlotsData));
+  }
+
+  let generateSlots = async (compaign, connection) => {
     // const dayStart = new Date(0, 0, 0); // Start of the day (midnight)
     // const dayEnd = new Date(23, 59, 59, 999); // End of the day
     try{
       let slotDuration = compaign.slotDuration;
-      let slotCount = compaign.slotCount;
+      let slotCount = parseInt(compaign.slotCount);
       slotDuration = slotDuration * 1000; // slotDuration seconds in milliseconds
       let compaignTime = compaign.time.split('-');
       let totalHours = parseInt(compaignTime[1]) - parseInt(compaignTime[0])
       console.log(JSON.stringify(compaignTime) + ' - ' + totalHours);
-      let gapMinutes = ((totalHours - 1) * 60)/slotCount;
+      let gapMinutes = (((totalHours - 1) * 60)/slotCount);
       const gapDuration = gapMinutes * 60 * 1000; // 1 hour in milliseconds
   
-      let startDate = new Date(compaign.startDate);
+      let MstartDate = new Date(compaign.startDate);
       let endDate = new Date(compaign.endDate);
       let slots = [];
       let slotInsertValues = [];
       const usedNumbers = [];
       let dateIndex = 0;
-      console.log(`${startDate} - ${endDate} - ${slotDuration} - ${gapDuration}`);
-      for (startDate; startDate <= endDate; startDate.setDate(startDate.getDate() + 1)) {
-        console.log('Current Date:', startDate);
-        const startTime = moment().startOf('day').add(8, 'hours'); // Start at 6 AM
-        const endTime = moment().endOf('day').subtract(1, 'hours'); // End at 6 PM (excluding the last 6 hours)
-        let index = 0;
-        let randomNumber;
-        do {
-          randomNumber = getRandomNumber(usedNumbers);
-        } while (usedNumbers.includes(randomNumber)); // Ensure non-repeating number
-        console.log("Ramndom Numner"+randomNumber);
-        usedNumbers.push(randomNumber);
-        dateIndex++;
-        console.log(dateIndex);
-        let currentSlot = startTime.add((randomNumber * 60 * 1000), 'milliseconds');
-        
-        // console.log(randomNumber);
-        while (currentSlot.isBefore(endTime)) {
-          slots.push({
-            compaignId: compaign.compaignId,
-            date: moment(startDate).format("DD-MM-YYYY"),
-            start_time: currentSlot.format('HH:mm:ss.SSS'), // Timestamp with milliseconds
-            end_time: currentSlot.add(slotDuration).format('HH:mm:ss.SSS')
-          });
-          slotInsertValues.push(`('${currentSlot.format('HH:mm:ss.SSS')}', '${currentSlot.add(slotDuration).format('HH:mm:ss.SSS')}', ${compaign.compaignId}, '${new Date(startDate).toISOString().slice(0, 19).replace('T', ' ')}')`)
-          index++;
-          console.log(index);
+      console.log(`${MstartDate} - ${endDate} - ${slotDuration} - ${gapDuration}`);
+      let channelsArray = compaign.channels.split(",");
+      console.log(channelsArray.length);
+      for (let channel = 0; channel < channelsArray.length; channel++) {
+        const selectedChannel = channelsArray[channel];
+        console.log("selected channel::"+selectedChannel+":MstartDate:"+MstartDate);
+        for (var startDate = new Date(compaign.startDate); startDate <= endDate; startDate.setDate(startDate.getDate() + 1)) {
+          console.log('Current Date:', startDate +"  --- "+ MstartDate);
+          let existingSlots = await fetchExistingSlots(compaign, startDate, connection);
+          const startTime = moment().startOf('day').add(parseInt(compaignTime[0]), 'hours'); // Start at 6 AM
+          const endTime = moment().endOf('day').add((parseInt(compaignTime[1])-1), 'hours').add(59, 'minutes'); // End at 6 PM (excluding the last 6 hours)
+          // const startTime = parseInt(compaignTime[0]) // Start at 6 AM
+          // const endTime = parseInt(compaignTime[1]) // End at 6 PM (excluding the last 6 hours)
           
-          currentSlot = currentSlot.add(slotDuration + (gapDuration));
+          let index = 0;
+          let randomNumber = (Math.random() * (5- 1) + 1);
+          // do {
+          //   randomNumber = getRandomNumber(usedNumbers);
+          // } while (usedNumbers.includes(randomNumber)); // Ensure non-repeating number
+          // console.log("Ramndom Numner::"+randomNumber);
+          // usedNumbers.push(randomNumber);
+          dateIndex++;
+          // console.log(dateIndex);
+          let currentSlot = startTime.add((randomNumber * 60 * 1000), 'milliseconds');
+          for (let slotIndex = 0; slotIndex < slotCount; slotIndex++) {
+              slots.push({
+                compaignId: compaign.compaignId,
+                date: moment(startDate).format("DD-MM-YYYY"),
+                start_time: currentSlot.format('HH:mm:ss.SSS'), // Timestamp with milliseconds
+                end_time: currentSlot.add(slotDuration).format('HH:mm:ss.SSS')
+              });
+              slotInsertValues.push(`('${currentSlot.format('HH:mm:ss.SSS')}', '${currentSlot.add(slotDuration).format('HH:mm:ss.SSS')}', ${compaign.compaignId}, '${new Date(startDate).toISOString().slice(0, 19).replace('T', ' ')}', ${compaign.network}, '${selectedChannel}')`)
+              index++;
+              // console.log(index);
+              
+              if(currentSlot.isBefore(endTime)){
+                currentSlot = currentSlot.add(slotDuration + (gapDuration));
+              }else{
+                currentSlot = currentSlot.add(slotDuration - (gapDuration/2));
+              }
+          }
+          // console.log(randomNumber);
+          // while (currentSlot.isBefore(endTime)) {
+          //   slots.push({
+          //     compaignId: compaign.compaignId,
+          //     date: moment(startDate).format("DD-MM-YYYY"),
+          //     start_time: currentSlot.format('HH:mm:ss.SSS'), // Timestamp with milliseconds
+          //     end_time: currentSlot.add(slotDuration).format('HH:mm:ss.SSS')
+          //   });
+          //   slotInsertValues.push(`('${currentSlot.format('HH:mm:ss.SSS')}', '${currentSlot.add(slotDuration).format('HH:mm:ss.SSS')}', ${compaign.compaignId}, '${new Date(startDate).toISOString().slice(0, 19).replace('T', ' ')}')`)
+          //   index++;
+          //   console.log(index);
+          //   if (index == slotCount) {
+          //     break;
+          //   }
+          //   currentSlot = currentSlot.add(slotDuration + (gapDuration));
+          // }
+          
         }
-        
       }
+      
       // console.log(JSON.stringify(slots));
       return slotInsertValues;
     }catch(error){
@@ -123,7 +158,7 @@ let validateCompaign = async (compaign) => {
 
   function getRandomNumber(usedNumbers) {
     const availableNumbers = [];
-    for (let i = 1; i <= 30; i++) {
+    for (let i = 1; i <= 10; i++) {
       if (!usedNumbers.includes(i)) {
         availableNumbers.push(i);
       }
@@ -136,12 +171,13 @@ let validateCompaign = async (compaign) => {
   router.post('/add', isLoggedIn, async function(req, res, next) {
     let connection = await createConnection();
     let compaign = req.body;
-    console.log(JSON.stringify(compaign));
+    // console.log(JSON.stringify(compaign));
+    let existingSlots = await fetchExistingSlots(compaign, compaign.startDate, connection);
     let validateData = await validateCompaign(compaign);
-    console.log(validateData);
+    // console.log(validateData);
     if(validateData){
       compaign.channels = compaign.channels.join(",");
-      console.log(compaign.channels);
+      // console.log(compaign.channels);
 
       try{
         await connection.query('START TRANSACTION');
@@ -158,13 +194,13 @@ let validateCompaign = async (compaign) => {
           
           let lastIdQuery = `SELECT id from compaign order BY id DESC LIMIT 1`;
           let compaignId = await connection.query(lastIdQuery);
-          console.log("JSON::"+JSON.stringify(compaignId[0][0]));
+          // console.log("JSON::"+JSON.stringify(compaignId[0][0]));
           compaign.compaignId = compaignId[0][0].id;
           
-          let slots = await generateSlots(compaign);
-          let slotInsertQry = `INSERT INTO SLOTS (start_time, end_time, compaignId, date) values ${slots.join(',')}`
+          let slots = await generateSlots(compaign, connection);
+          let slotInsertQry = `INSERT INTO SLOTS (start_time, end_time, compaignId, date, network, channels) values ${slots.join(',')}`
           let [slotResp] = await connection.query(slotInsertQry);
-          console.log(slotInsertQry);
+          // console.log(slotInsertQry);
           await connection.query('COMMIT');
           res.status(200).json({ status: 200, message: 'Compaign Added Succussfully'});
         }
