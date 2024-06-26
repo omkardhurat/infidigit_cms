@@ -31,6 +31,24 @@ router.get('/get', isLoggedIn, async function(req, res, next) {
 
 
 
+router.get('/getClients', isLoggedIn, async function(req, res, next) {
+
+  let connection = await createConnection();
+  try{
+    const [results] = await connection.query(`SELECT * FROM CLIENT`);
+    console.log('Results:', results);
+    res.status(200).json({ status: 200, clients: results});
+  }catch(error){
+    console.log(error);
+    res.status(500).json({status: 500, message: 'Something Went wrong. Please contact administrator'});  
+  }finally{
+    await connection.end();
+  }
+
+});
+
+
+
 let validateCompaign = async (compaign) => {
     if(compaign.name == undefined || compaign.name == null || compaign.name == ''){
         return false;
@@ -53,6 +71,8 @@ let validateCompaign = async (compaign) => {
     }else if(compaign.time == undefined || compaign.time == null || compaign.time == ''){
       return false;
     }else if(compaign.slotCount == undefined || compaign.slotCount == null || compaign.slotCount == ''){
+      return false;
+    }else if(compaign.client == undefined || compaign.client == null || compaign.client == ''){
       return false;
     }else if(compaign.slotType == undefined || compaign.slotType == null || compaign.slotType == ''){
         return false;
@@ -189,7 +209,7 @@ let validateCompaign = async (compaign) => {
         if(diffDays <= 0 ){
           res.status(400).send('End Date must be after Start Date');
         }else{
-          let insertQuery = `INSERT INTO compaign(name, state, city, network, channels, product, brand, start_date, end_date, slot_type) values ('${compaign.name}', ${compaign.state}, ${compaign.city}, ${compaign.network}, '${compaign.channels}', '${compaign.product}', '${compaign.brand}', '${compaign.startDate}', '${compaign.endDate}', '${compaign.slotType}')`;
+          let insertQuery = `INSERT INTO compaign(name, state, city, network, channels, product, brand, start_date, end_date, slot_type, client) values ('${compaign.name}', ${compaign.state}, ${compaign.city}, ${compaign.network}, '${compaign.channels}', '${compaign.product}', '${compaign.brand}', '${compaign.startDate}', '${compaign.endDate}', '${compaign.slotType}', ${compaign.client})`;
           let [result] = await connection.query(insertQuery);
           
           let lastIdQuery = `SELECT id from compaign order BY id DESC LIMIT 1`;

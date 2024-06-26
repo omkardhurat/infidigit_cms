@@ -105,6 +105,11 @@
                   <label for="slotDuration">Slot Duration (In Seconds)</label>
                   <input type="number" class="form-control" id="slotDuration">
               </div>
+              <div class="form-group col col-12 col-sm-6 col-md-6">
+                <label for="clientSelect">Client</label>
+                <select  class="js-example-basic-single clientSelect form-control" id="clientSelect" name="clientSelect">
+                </select>
+            </div>
             </div>
                 <fieldset class="form-group">
                     <div class="row">
@@ -155,6 +160,7 @@ $(document).ready(function() {
 
 
         $('.view-form').click(function () {
+            loadClients();
             $('.listing').addClass('hide');
             $('.create-form').removeClass('hide')
         });
@@ -164,7 +170,29 @@ $(document).ready(function() {
         })
 
 
-
+function loadClients(){
+  $.ajax({
+      type : "GET",
+      url : "http://localhost:3000/compaign/getClients",
+      contentType : "application/json",
+      dataType : "json",  
+    }).done(function(data){
+      let clients = data.clients;
+      $('#clientSelect').empty().append(`<option class="" value=""></option>`)
+      for(var i=0;i<clients.length;i++){
+        $('#clientSelect').append(`<option class="" value="${clients[i].id}" data-id="${clients[i].id}">${clients[i].name}</option>`)
+      }
+      $('.clientSelect').select2({
+        placeholder:'Select Client'
+      })
+      .on('select2:select', function(e) {
+        console.log('Selecting: ' , e.params.data.id);
+        
+      });;
+      $('.select2-selection').addClass('form-control');
+      return;
+  });
+}
 
 function loadStates(){
   $.ajax({
@@ -315,6 +343,7 @@ function addCompaign(){
     time: $('#time').val(),
     slotCount: $('#slotCount').val(),
     slotDuration: $('#slotDuration').val(),
+    client: $('#clientSelect').val(),
     slotType: $("input[name='slotType']:checked").val()
   }
   $.ajax({
