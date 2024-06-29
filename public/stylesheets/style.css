@@ -176,3 +176,9 @@ a {
 .select2-selection--multiple .select2-search--inline .select2-search__field{
   margin-top: 0px !important;
 }
+
+.comapign-count-div{
+  border-top: 1px solid grey;
+  padding-top: 30px !important;
+  padding: 10px; 
+}

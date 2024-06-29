@@ -29,6 +29,29 @@ router.get('/get', isLoggedIn, async function(req, res, next) {
     
 });
 
+router.get('/dashboardCount', isLoggedIn, async function(req, res, next) {
+
+  let connection = await createConnection();
+  try{
+    const [results] = await connection.query(`SELECT count(*) as count,s.name as state, c.name as city From compaign com
+    INNER JOIN city c 
+    on c.id= com.city
+    INNER JOIN state s
+    on s.id=c.state
+    group by city`);
+    console.log('Results:', results);
+    res.status(200).json({ status: 200, count: results});
+  }catch(error){
+    console.log(error);
+    res.status(500).json({status: 500, message: 'Something Went wrong. Please contact administrator'});  
+  }finally{
+    await connection.end();
+  }
+   
+    
+});
+
+
 
 
 router.get('/getClients', isLoggedIn, async function(req, res, next) {
@@ -82,7 +105,11 @@ let validateCompaign = async (compaign) => {
   }
 
   let fetchExistingSlots = async (compaign, slotDate, connection) => {
-    let slotFetchQuery = `SELECT start_time, end_time FROM cms_app.slots where date = '${moment(slotDate).format("YYYY-MM-DD")}';`
+    let slotFetchQuery = `SELECT start_time, end_time FROM cms_app.slots where date = '${moment(slotDate).format("YYYY-MM-DD")}';`;
+
+    // SELECT TIME(start_time-20), start_time, end_time, TIME(end_time+1) FROM cms_app.slots where date = '2024-07-01';
+
+    // select * from slots where TIME('06:01:34') between start_time-20 and end_time+1 and date = '2024-07-01' and channels=14;
     let [existSlotsData] = await connection.query(slotFetchQuery);
     console.log(JSON.stringify(existSlotsData));
   }
@@ -209,7 +236,7 @@ let validateCompaign = async (compaign) => {
         if(diffDays <= 0 ){
           res.status(400).send('End Date must be after Start Date');
         }else{
-          let insertQuery = `INSERT INTO compaign(name, state, city, network, channels, product, brand, start_date, end_date, slot_type, client) values ('${compaign.name}', ${compaign.state}, ${compaign.city}, ${compaign.network}, '${compaign.channels}', '${compaign.product}', '${compaign.brand}', '${compaign.startDate}', '${compaign.endDate}', '${compaign.slotType}', ${compaign.client})`;
+          let insertQuery = `INSERT INTO compaign(name, state, city, network, channels, product, brand, start_date, end_date, slot_type, client, isApproved) values ('${compaign.name}', ${compaign.state}, ${compaign.city}, ${compaign.network}, '${compaign.channels}', '${compaign.product}', '${compaign.brand}', '${compaign.startDate}', '${compaign.endDate}', '${compaign.slotType}', ${compaign.client}, 1)`;
           let [result] = await connection.query(insertQuery);
           
           let lastIdQuery = `SELECT id from compaign order BY id DESC LIMIT 1`;

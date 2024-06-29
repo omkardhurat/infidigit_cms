@@ -1,15 +1,65 @@
 <%- include('./sidemenu.ejs') %>
+  <style>
+    
+  </style>
+  <section class="home-section" >
+    <div class="home-content">
+      <i class='bx bx-menu'></i>
+      <span class="text">Dashboard</span>
+    </div>
+    <div style="width: 45%;border: 1px solid grey; margin: 20px;">
+      <!-- Hello Dashboard -->
+      <h4 style="text-align: center;">Compaigns</h4>
+      <div class="comapign-count-div">
+        <div class="table-responsive">
+      
+          <table id="example" class="display table table-responsive" style="width:100%">
+            <thead>
+                <tr>
+                    <th>State</th>
+                    <th>City</th>
+                    <th>Count</th>
+                </tr>
+            </thead>
+          
+            
+          </table> </div>
+      </div>
+    </div>
+    
+  </section>
+<script>
+  
+$(document).ready(function() {
+  loadDashboardCount();
+});
+function loadDashboardCount(){
+  $.ajax({
+      type : "GET",
+      url : "http://localhost:3000/compaign/dashboardCount",
+      contentType : "application/json",
+      dataType : "json",  
+    }).done(function(data){
+      console.log("Resp:"+JSON.stringify(data));
 
+      let dataSet = data.count;
+      new DataTable('#example', {
+        data: dataSet, 
+        "retrieve": true,
+        info: false,
+        ordering: false,
+        paging: false,
+        searching: false,
+        columns: [
+          { data: 'state' },
+          { data: 'city' },
+          { data: 'count' }
+        ]
+      });
+      return;
+  });
+}
 
-<section class="home-section">
-  <div class="home-content">
-    <i class='bx bx-menu' ></i>
-    <span class="text">Dashboard</span>
-  </div>
-  <div>
-       <!-- Hello Dashboard -->
-  </div>
-</section>
+</script>
 
- 
-<%- include('./toggle.ejs') %>
+  <%- include('./toggle.ejs') %>
