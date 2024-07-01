@@ -105,7 +105,7 @@ let validateCompaign = async (compaign) => {
   }
 
   let fetchExistingSlots = async (compaign, slotDate, connection, selectedChannel, selectedTime) => {
-    let slotFetchQuery = `select * from slots where TIME('${selectedTime}') between start_time-20 and end_time+10 and date = '${moment(slotDate).format("YYYY-MM-DD")}' and channels=${selectedChannel};`;
+    let slotFetchQuery = `select * from slots where TIME('${selectedTime}') between start_time-30 and end_time+30 and date = '${moment(slotDate).format("YYYY-MM-DD")}' and channels=${selectedChannel};`;
 
     // SELECT TIME(start_time-20), start_time, end_time, TIME(end_time+1) FROM cms_app.slots where date = '2024-07-01';
 
@@ -160,7 +160,7 @@ let validateCompaign = async (compaign) => {
           let currentSlot = startTime.add((randomNumber * 60 * 1000), 'milliseconds');
           // let existingSlots = await fetchExistingSlots(compaign, startDate, connection, selectedChannel, currentSlot.format('HH:mm:ss.SSS'));
           while(!await fetchExistingSlots(compaign, startDate, connection, selectedChannel, currentSlot.format('HH:mm:ss.SSS'))) {
-              currentSlot = startTime.add((Math.random() * (2- 1) + 1), 'milliseconds');
+              currentSlot = startTime.add(((Math.random() * (4- 1) + 1) * 60 * 1000), 'milliseconds');
           }
           for (let slotIndex = 0; slotIndex < slotCount; slotIndex++) {
               slots.push({
