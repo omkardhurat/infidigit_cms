@@ -104,16 +104,26 @@ let validateCompaign = async (compaign) => {
     }
   }
 
-  let fetchExistingSlots = async (compaign, slotDate, connection, selectedChannel, selectedTime) => {
-    let slotFetchQuery = `select * from slots where TIME('${selectedTime}') between start_time-30 and end_time+30 and date = '${moment(slotDate).format("YYYY-MM-DD")}' and channels=${selectedChannel};`;
+  let fetchExistingSlots = async (compaign, slotDate, connection, selectedChannel, selectedTime, endTimeF) => {
+    // let slotFetchQuery = `select * from slots where (TIME('${selectedTime}') between TIME(start_time) and TIME(end_time) OR TIME('${endTimeF}') between TIME(start_time) and TIME(end_time)) and date = '${moment(slotDate).format("YYYY-MM-DD")}' and channels=${selectedChannel};`;
 
+    let slotFetchQuery = `select * from slots where 
+                          (
+                          TIME('${selectedTime}') between (start_time) and (end_time)
+                          OR TIME('${endTimeF}') between (start_time) and (end_time)
+                          )
+                          and date = '${moment(slotDate).format("YYYY-MM-DD")}' 
+                          and channels=${selectedChannel}`;
     // SELECT TIME(start_time-20), start_time, end_time, TIME(end_time+1) FROM cms_app.slots where date = '2024-07-01';
 
     // select * from slots where TIME('06:01:34') between start_time-20 and end_time+1 and date = '2024-07-01' and channels=14;
-    console.log(slotFetchQuery);
+    
     let [existSlotsData] = await connection.query(slotFetchQuery);
     console.log(JSON.stringify(existSlotsData));
-    return (existSlotsData.length == 0);
+    if(existSlotsData.length != 0){
+      console.log(slotFetchQuery);
+    }
+    return (existSlotsData.length != 0);
   }
 
   let generateSlots = async (compaign, connection) => {
@@ -142,7 +152,7 @@ let validateCompaign = async (compaign) => {
         const selectedChannel = channelsArray[channel];
         console.log("selected channel::"+selectedChannel+":MstartDate:"+MstartDate);
         for (var startDate = new Date(compaign.startDate); startDate <= endDate; startDate.setDate(startDate.getDate() + 1)) {
-          console.log('Current Date:', startDate +"  --- "+ MstartDate);
+          // console.log('Current Date:', startDate +"  --- "+ MstartDate);
           const startTime = moment().startOf('day').add(parseInt(compaignTime[0]), 'hours'); // Start at 6 AM
           const endTime = moment().endOf('day').add((parseInt(compaignTime[1])-1), 'hours').add(59, 'minutes'); // End at 6 PM (excluding the last 6 hours)
           // const startTime = parseInt(compaignTime[0]) // Start at 6 AM
@@ -159,17 +169,25 @@ let validateCompaign = async (compaign) => {
           // console.log(dateIndex);
           let currentSlot = startTime.add((randomNumber * 60 * 1000), 'milliseconds');
           // let existingSlots = await fetchExistingSlots(compaign, startDate, connection, selectedChannel, currentSlot.format('HH:mm:ss.SSS'));
-          while(!await fetchExistingSlots(compaign, startDate, connection, selectedChannel, currentSlot.format('HH:mm:ss.SSS'))) {
-              currentSlot = startTime.add(((Math.random() * (4- 1) + 1) * 60 * 1000), 'milliseconds');
+          while(await fetchExistingSlots(compaign, startDate, connection, selectedChannel, currentSlot.format('HH:mm:ss'), currentSlot.add(slotDuration).format('HH:mm:ss'))) {
+              currentSlot = currentSlot.add(((Math.random() * (4- 1) + 1) * 60 * 1000), 'milliseconds');
+              console.log("slot in loop::::"+currentSlot.format('HH:mm:ss'));
           }
+          // do{
+          //   currentSlot = currentSlot.add(((Math.random() * (4- 1) + 1) * 30 * 1000), 'milliseconds');
+          //   console.log("slot in loop::::"+currentSlot.format('HH:mm:ss'));
+          // }
+          // while(!await fetchExistingSlots(compaign, startDate, connection, selectedChannel, currentSlot.format('HH:mm:ss'), currentSlot.add(slotDuration).format('HH:mm:ss'))) 
+          let endSlot = currentSlot;
+          console.log("selected slot::==="+currentSlot.format('HH:mm:ss'));
           for (let slotIndex = 0; slotIndex < slotCount; slotIndex++) {
-              slots.push({
-                compaignId: compaign.compaignId,
-                date: moment(startDate).format("DD-MM-YYYY"),
-                start_time: currentSlot.format('HH:mm:ss.SSS'), // Timestamp with milliseconds
-                end_time: currentSlot.add(slotDuration).format('HH:mm:ss.SSS')
-              });
-              slotInsertValues.push(`('${currentSlot.format('HH:mm:ss.SSS')}', '${currentSlot.add(slotDuration).format('HH:mm:ss.SSS')}', ${compaign.compaignId}, '${new Date(startDate).toISOString().slice(0, 19).replace('T', ' ')}', ${compaign.network}, '${selectedChannel}')`)
+              // slots.push({
+              //   compaignId: compaign.compaignId,
+              //   date: moment(startDate).format("DD-MM-YYYY"),
+              //   start_time: currentSlot.format('HH:mm:ss'), // Timestamp with milliseconds
+              //   end_time: currentSlot.add(slotDuration).format('HH:mm:ss')
+              // });
+              slotInsertValues.push(`('${currentSlot.format('HH:mm:ss')}', '${currentSlot.add(slotDuration).format('HH:mm:ss')}', ${compaign.compaignId}, '${new Date(startDate).toISOString().slice(0, 19).replace('T', ' ')}', ${compaign.network}, '${selectedChannel}', ${compaign.slotDuration})`)
               index++;
               // console.log(index);
               
@@ -241,7 +259,7 @@ let validateCompaign = async (compaign) => {
         if(diffDays <= 0 ){
           res.status(400).send('End Date must be after Start Date');
         }else{
-          let insertQuery = `INSERT INTO compaign(name, state, city, network, channels, product, brand, start_date, end_date, slot_type, client, isApproved) values ('${compaign.name}', ${compaign.state}, ${compaign.city}, ${compaign.network}, '${compaign.channels}', '${compaign.product}', '${compaign.brand}', '${compaign.startDate}', '${compaign.endDate}', '${compaign.slotType}', ${compaign.client}, 1)`;
+          let insertQuery = `INSERT INTO compaign(name, state, city, network, channels, product, brand, start_date, end_date, slot_type, client, isApproved, duration, slotCount) values ('${compaign.name}', ${compaign.state}, ${compaign.city}, ${compaign.network}, '${compaign.channels}', '${compaign.product}', '${compaign.brand}', '${compaign.startDate}', '${compaign.endDate}', '${compaign.slotType}', ${compaign.client}, 1, ${compaign.slotDuration}, ${compaign.slotCount})`;
           let [result] = await connection.query(insertQuery);
           
           let lastIdQuery = `SELECT id from compaign order BY id DESC LIMIT 1`;
@@ -250,7 +268,7 @@ let validateCompaign = async (compaign) => {
           compaign.compaignId = compaignId[0][0].id;
           
           let slots = await generateSlots(compaign, connection);
-          let slotInsertQry = `INSERT INTO SLOTS (start_time, end_time, compaignId, date, network, channels) values ${slots.join(',')}`
+          let slotInsertQry = `INSERT INTO SLOTS (start_time, end_time, compaignId, date, network, channels, duration) values ${slots.join(',')}`
           let [slotResp] = await connection.query(slotInsertQry);
           // console.log(slotInsertQry);
           await connection.query('COMMIT');
