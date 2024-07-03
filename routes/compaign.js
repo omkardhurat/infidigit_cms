@@ -104,12 +104,13 @@ let validateCompaign = async (compaign) => {
     }
   }
 
-  let fetchExistingSlots = async (compaign, slotDate, connection, selectedChannel, selectedTime, endTimeF) => {
+  let fetchExistingSlots = async (compaign, slotDate, connection, selectedChannel, selectedTime, endTime) => {
     // let slotFetchQuery = `select * from slots where (TIME('${selectedTime}') between TIME(start_time) and TIME(end_time) OR TIME('${endTimeF}') between TIME(start_time) and TIME(end_time)) and date = '${moment(slotDate).format("YYYY-MM-DD")}' and channels=${selectedChannel};`;
-
+    let startTimeF = selectedTime.format('HH:mm:ss');
+    let endTimeF = endTime.format('HH:mm:ss')
     let slotFetchQuery = `select * from slots where 
                           (
-                          TIME('${selectedTime}') between (start_time) and (end_time)
+                          TIME('${startTimeF}') between (start_time) and (end_time)
                           OR TIME('${endTimeF}') between (start_time) and (end_time)
                           )
                           and date = '${moment(slotDate).format("YYYY-MM-DD")}' 
@@ -167,10 +168,13 @@ let validateCompaign = async (compaign) => {
           // usedNumbers.push(randomNumber);
           dateIndex++;
           // console.log(dateIndex);
-          let currentSlot = startTime.add((randomNumber * 60 * 1000), 'milliseconds');
+          let currentSlot = startTime.clone().add((randomNumber * 60 * 1000), 'milliseconds');
+          let endSlot = startTime.clone().add((randomNumber * 60 * 1000), 'milliseconds').add(slotDuration);
           // let existingSlots = await fetchExistingSlots(compaign, startDate, connection, selectedChannel, currentSlot.format('HH:mm:ss.SSS'));
-          while(await fetchExistingSlots(compaign, startDate, connection, selectedChannel, currentSlot.format('HH:mm:ss'), currentSlot.add(slotDuration).format('HH:mm:ss'))) {
-              currentSlot = currentSlot.add(((Math.random() * (4- 1) + 1) * 60 * 1000), 'milliseconds');
+          while(await fetchExistingSlots(compaign, startDate, connection, selectedChannel, currentSlot, endSlot)) {
+              let newRandomNumber = (Math.random() * (4- 1) + 1);
+              currentSlot = currentSlot.add((newRandomNumber * 60 * 1000), 'milliseconds');
+              endSlot = currentSlot.clone().add(slotDuration)
               console.log("slot in loop::::"+currentSlot.format('HH:mm:ss'));
           }
           // do{
@@ -178,7 +182,7 @@ let validateCompaign = async (compaign) => {
           //   console.log("slot in loop::::"+currentSlot.format('HH:mm:ss'));
           // }
           // while(!await fetchExistingSlots(compaign, startDate, connection, selectedChannel, currentSlot.format('HH:mm:ss'), currentSlot.add(slotDuration).format('HH:mm:ss'))) 
-          let endSlot = currentSlot;
+          // let endSlot = currentSlot;
           console.log("selected slot::==="+currentSlot.format('HH:mm:ss'));
           for (let slotIndex = 0; slotIndex < slotCount; slotIndex++) {
               // slots.push({
@@ -187,20 +191,22 @@ let validateCompaign = async (compaign) => {
               //   start_time: currentSlot.format('HH:mm:ss'), // Timestamp with milliseconds
               //   end_time: currentSlot.add(slotDuration).format('HH:mm:ss')
               // });
-              slotInsertValues.push(`('${currentSlot.format('HH:mm:ss')}', '${currentSlot.add(slotDuration).format('HH:mm:ss')}', ${compaign.compaignId}, '${new Date(startDate).toISOString().slice(0, 19).replace('T', ' ')}', ${compaign.network}, '${selectedChannel}', ${compaign.slotDuration})`)
+              slotInsertValues.push(`('${currentSlot.format('HH:mm:ss')}', '${endSlot.format('HH:mm:ss')}', ${compaign.compaignId}, '${new Date(startDate).toISOString().slice(0, 19).replace('T', ' ')}', ${compaign.network}, '${selectedChannel}', ${compaign.slotDuration})`)
               index++;
               // console.log(index);
-              
+              let loopRandomNumber = (Math.random() * (4- 1) + 1);
               if(currentSlot.isBefore(endTime)){
-                currentSlot = currentSlot.add(slotDuration + (gapDuration));
-                  while(await fetchExistingSlots(compaign, startDate, connection, selectedChannel, currentSlot.format('HH:mm:ss'), currentSlot.add(slotDuration).format('HH:mm:ss'))) {
-                    currentSlot = currentSlot.add(((Math.random() * (4- 1) + 1) * 60 * 1000), 'milliseconds');
+                  currentSlot = currentSlot.add(slotDuration + (gapDuration));
+                  endSlot = currentSlot.clone().add(slotDuration)
+                  while(await fetchExistingSlots(compaign, startDate, connection, selectedChannel, currentSlot, endSlot)) {
+                    currentSlot = currentSlot.add((loopRandomNumber * 60 * 1000), 'milliseconds');
                     console.log("slot in loop::::"+currentSlot.format('HH:mm:ss'));
                 }
               }else{
-                currentSlot = currentSlot.add(slotDuration - (gapDuration/2));
-                  while(await fetchExistingSlots(compaign, startDate, connection, selectedChannel, currentSlot.format('HH:mm:ss'), currentSlot.add(slotDuration).format('HH:mm:ss'))) {
-                    currentSlot = currentSlot.add(((Math.random() * (4- 1) + 1) * 60 * 1000), 'milliseconds');
+                  currentSlot = currentSlot.add(slotDuration - (gapDuration/2));
+                  endSlot = currentSlot.clone().add(slotDuration)
+                  while(await fetchExistingSlots(compaign, startDate, connection, selectedChannel, currentSlot, endSlot)) {
+                    currentSlot = currentSlot.add((loopRandomNumber * 60 * 1000), 'milliseconds');
                     console.log("slot in loop::::"+currentSlot.format('HH:mm:ss'));
                   }
               }
