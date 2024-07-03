@@ -193,8 +193,16 @@ let validateCompaign = async (compaign) => {
               
               if(currentSlot.isBefore(endTime)){
                 currentSlot = currentSlot.add(slotDuration + (gapDuration));
+                  while(await fetchExistingSlots(compaign, startDate, connection, selectedChannel, currentSlot.format('HH:mm:ss'), currentSlot.add(slotDuration).format('HH:mm:ss'))) {
+                    currentSlot = currentSlot.add(((Math.random() * (4- 1) + 1) * 60 * 1000), 'milliseconds');
+                    console.log("slot in loop::::"+currentSlot.format('HH:mm:ss'));
+                }
               }else{
                 currentSlot = currentSlot.add(slotDuration - (gapDuration/2));
+                  while(await fetchExistingSlots(compaign, startDate, connection, selectedChannel, currentSlot.format('HH:mm:ss'), currentSlot.add(slotDuration).format('HH:mm:ss'))) {
+                    currentSlot = currentSlot.add(((Math.random() * (4- 1) + 1) * 60 * 1000), 'milliseconds');
+                    console.log("slot in loop::::"+currentSlot.format('HH:mm:ss'));
+                  }
               }
           }
           // console.log(randomNumber);
