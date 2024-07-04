@@ -1,7 +1,18 @@
 
 <%- include('../dashboard/sidemenu.ejs') %>
 
-
+<style>
+  div.action-buttons {
+        white-space: nowrap;
+    }
+ 
+    div.action-buttons span {
+        display: inline-block;
+        min-width: 20px;
+        font-size: 20px;
+        cursor: pointer;
+    }
+</style>
 <section class="home-section">
   <div class="home-content">
     <i class='bx bx-menu' ></i>
@@ -25,6 +36,7 @@
                 <th>City</th>
                 <th>Created At</th>
                 <th>Updated At</th>
+                <th>Actions</th>
             </tr>
         </thead>
       
@@ -155,11 +167,11 @@ function loadChannels(){
       contentType : "application/json",
       dataType : "json",  
     }).done(function(data){
-      console.log("Resp:"+JSON.stringify(data));
+      // console.log("Resp:"+JSON.stringify(data));
       let dataSet = data.channels;
       
     
-    new DataTable('#example', {
+      var table =  new DataTable('#example', {
       data: dataSet, 
       "retrieve": true,
       columns: [
@@ -168,10 +180,37 @@ function loadChannels(){
         { data: 'state' },
         { data: 'city' },
         { data: 'created_at' },
-        { data: 'updated_at' }
+        { data: 'updated_at' },
+        {
+            data: null,
+            defaultContent:
+                `<div class="action-buttons">
+                  <span data-id='${data.id}' class="remove"><i class="fa fa-trash"></i></span> 
+                </div>`,
+            className: 'row-edit dt-center',
+            orderable: false
+        }
       ]
+    }).on('click', 'tbody span.remove', function (e) {
+      if (window.confirm("Do you really want to Delete the Channel?")) {
+        console.log($(this).parent().parent().parent().children()[0].textContent);
+        let channelId = $(this).parent().parent().parent().children()[0].textContent;
+        $.ajax({
+          type : "DELETE",
+          url : "http://localhost:3000/channel/delete/"+channelId,
+          success: function(data){
+            console.log(JSON.stringify(data));
+            // $('.view-listing').trigger('click');
+            alert(data.message);
+            window.location.reload();
+          },
+          error: function(xhr, ajaxOptions, thrownError) {
+            alert(xhr.responseText);
+          }
+        });
+      }
     });
-      return;
+    return;
   });
 }
 
@@ -198,6 +237,10 @@ function addChannel(){
       }
     });
 }
+
+// table.on('click', 'tbody span.remove', function (e) {
+//     alert("Delete called")
+// });
  
 </script>
 
