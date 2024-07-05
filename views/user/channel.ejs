@@ -80,6 +80,42 @@
         <button type="button" class="btn btn-primary add-channel">Submit</button>
     </form>
   </div>
+
+  <div class="edit-form hide">
+    <h4>Edit Channel</h4>
+    <br>
+    <form>
+      <span class="hide" id="editChannelId"></span>
+      <div class="form-group form-panel">
+        <label for="stateSelect">State : </label>
+        <span id="editState"></span>
+      </div>
+
+      <div class="form-group form-panel">
+        <label for="citySelect">City : </label>
+        <span id="editCity"></span>
+      </div>
+
+
+        <div class="form-group form-panel">
+          <label for="editChannelName">Channel Name</label>
+          <input type="text" class="form-control" id="editChannelName" >
+        </div>
+
+        <!-- <div class="form-group form-panel">
+            <label for="channelCode">Channel Code</label>
+            <input type="number" class="form-control" id="channelCode" >
+        </div>
+-->
+        <div class="form-group form-panel">
+          <label for="editChannelProducer">Producer Name</label>
+          <input type="text" class="form-control" id="editChannelProducer" >
+      </div> 
+      <br>
+        <button type="button" class="btn btn-danger view-listing">Cancel</button>
+        <button type="button" class="btn btn-primary edit-channel">Update</button>
+    </form>
+  </div>
 </section>
 
 <script>
@@ -99,14 +135,20 @@
     $('.add-channel').click(function(e){
       addChannel()
     })
+    $('.edit-channel').click(function(e){
+      let selectedChId = $('#editChannelId').text()
+      editChannel(selectedChId)
+    })
   })
   $('.view-form').click(function(){
     $('.listing').addClass('hide');
     $('.create-form').removeClass('hide')
+    $('.edit-form').addClass('hide')
   });
   $('.view-listing').click(function(){
     $('.listing').removeClass('hide');
-    $('.create-form').addClass('hide')
+    $('.create-form').addClass('hide');
+    $('.edit-form').addClass('hide')
   })
 
   
@@ -185,7 +227,8 @@ function loadChannels(){
             data: null,
             defaultContent:
                 `<div class="action-buttons">
-                  <span data-id='${data.id}' class="remove"><i class="fa fa-trash"></i></span> 
+                  <span class="edit"><i class="fa fa-pencil"></i></span> 
+                  <span class="remove"><i class="fa fa-trash"></i></span> 
                 </div>`,
             className: 'row-edit dt-center',
             orderable: false
@@ -209,6 +252,28 @@ function loadChannels(){
           }
         });
       }
+    }).on('click', 'tbody span.edit', function (e) {
+      console.log($(this).parent().parent().parent().children()[0].textContent);
+        let channelId = $(this).parent().parent().parent().children()[0].textContent;
+        $.ajax({
+          type : "GET",
+          url : "http://localhost:3000/channel/getById/"+channelId,
+          success: function(data){
+            console.log(JSON.stringify(data));
+            let channelData = data.channel[0];
+
+            $('.listing').addClass('hide');
+            $('.edit-form').removeClass('hide');
+            $('#editState').text(channelData.state);
+            $('#editCity').text(channelData.city);
+            $('#editChannelName').val(channelData.name);
+            $('#editChannelProducer').val(channelData.producer);
+            $('#editChannelId').text(channelData.id)
+          },
+          error: function(xhr, ajaxOptions, thrownError) {
+            alert(xhr.responseText);
+          }
+        });
     });
     return;
   });
@@ -225,6 +290,29 @@ function addChannel(){
   $.ajax({
       type : "POST",
       url : "http://localhost:3000/channel/add",
+      data: reqBody,
+      success: function(data){
+        console.log(JSON.stringify(data));
+        // $('.view-listing').trigger('click');
+        alert(data.message);
+        window.location.reload();
+      },
+      error: function(xhr, ajaxOptions, thrownError) {
+        alert(xhr.responseText);
+      }
+    });
+}
+
+
+function editChannel(channelId){
+  
+  let reqBody = {
+    name: $('#editChannelName').val(),
+    producer: $('#editChannelProducer').val()
+  }
+  $.ajax({
+      type : "POST",
+      url : "http://localhost:3000/channel/edit/"+channelId,
       data: reqBody,
       success: function(data){
         console.log(JSON.stringify(data));

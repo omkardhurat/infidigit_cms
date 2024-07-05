@@ -8,7 +8,7 @@ var router = express.Router();
 router.get('/get', isLoggedIn, async function(req, res, next) {
     let connection = await createConnection();
     try{
-      let countQuery = `SELECT CH.id, CH.name, CH.created_at, CH.updated_at, S.NAME AS state, C.NAME AS city, 'delete' as icon FROM CHANNEL CH 
+      let countQuery = `SELECT CH.id, CH.name, CH.created_at, CH.updated_at, S.NAME AS state, C.NAME AS city FROM CHANNEL CH 
         INNER JOIN STATE S 
         ON S.ID = CH.STATE
         INNER JOIN CITY C
@@ -25,6 +25,28 @@ router.get('/get', isLoggedIn, async function(req, res, next) {
     
 });
 
+router.get('/getById/:id', isLoggedIn, async function(req, res, next) {
+  let connection = await createConnection();
+  try{
+    let channelId= req.params.id;
+    let countQuery = `SELECT CH.id, CH.name, CH.created_at, CH.updated_at, CH.producer, S.NAME AS state, C.NAME AS city FROM CHANNEL CH 
+    INNER JOIN STATE S 
+        ON S.ID = CH.STATE
+        INNER JOIN CITY C
+        ON C.ID = CH.CITY   
+    where CH.isDeleted=0 and CH.id=${channelId}`;
+    let [result] = await connection.query(countQuery);
+    res.status(200).json({ status: 200, channel: result});
+  }catch(error){
+    console.log(error);
+    res.status(500).json({status: 500, message: 'Something Went wrong. Please contact administrator'});  
+  }finally{
+    await connection.end();
+  }
+  
+  
+});
+
 router.delete('/delete/:id', isLoggedIn, async function(req, res, next) {
   let connection = await createConnection();
   let channelId= req.params.id;
@@ -32,6 +54,26 @@ router.delete('/delete/:id', isLoggedIn, async function(req, res, next) {
     let countQuery = `update channel set isDeleted=1, updated_at='${new Date().toISOString().slice(0, 19).replace('T', ' ')}' where id=${channelId}`;
     let [result] = await connection.query(countQuery);
     res.status(200).json({ status: 200, message: "Channel Deleted Successfully"});
+  }catch(error){
+    console.log(error);
+    res.status(500).json({status: 500, message: 'Something Went wrong. Please contact administrator'});  
+  }finally{
+    await connection.end();
+  }
+  
+  
+});
+
+router.post('/edit/:id', isLoggedIn, async function(req, res, next) {
+  let connection = await createConnection();
+  let channelId= req.params.id;
+  console.log("req.body::"+JSON.stringify(req.body));
+  let channelName = req.body.name;
+  let producer = req.body.producer;
+  try{
+    let countQuery = `update channel set name='${channelName}', producer='${producer}', updated_at='${new Date().toISOString().slice(0, 19).replace('T', ' ')}' where id=${channelId}`;
+    let [result] = await connection.query(countQuery);
+    res.status(200).json({ status: 200, message: "Channel Updated Successfully"});
   }catch(error){
     console.log(error);
     res.status(500).json({status: 500, message: 'Something Went wrong. Please contact administrator'});  
