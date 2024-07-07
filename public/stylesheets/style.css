@@ -183,3 +183,9 @@ a {
   padding-top: 30px !important;
   padding: 10px; 
 }
+
+.hide{
+  /* transition: opacity 4s; */
+  transform: scaleY(1);
+  transition: transform 400ms ease 0ms;
+}

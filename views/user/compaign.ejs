@@ -74,7 +74,7 @@
                         <input type="text" class="form-control" id="brand">
                     </div>
                 </div>
-                <div class="row">
+                <div class="row static-date-select">
                     <div class="form-group col col-12 col-sm-6 col-md-6">
                         <label for="startDate">Start Date</label>
                         <input type="date" class="form-control" id="startDate">
@@ -86,15 +86,11 @@
                 </div>
                 <div class="row">
                   <div class="form-group col col-12 col-sm-6 col-md-6">
-                      <label for="time">Time</label>
-                      <select id="time" class="form-control">
-                        <option value="06-24" selected>06.00 - 24.00</option>
-                        <option value="07-24" >07.00 - 24.00</option>
-                        <option value="08-24" >08.00 - 24.00</option>
-                        <option value="09-24" >09.00 - 24.00</option>
-                        <option value="10-24" >10.00 - 24.00</option>
-                      </select>
-                  </div>
+                    <label for="clientSelect">Client</label>
+                    <select  class="js-example-basic-single clientSelect form-control" id="clientSelect" name="clientSelect">
+                    </select>
+                </div>
+                  
                   <div class="form-group col col-12 col-sm-6 col-md-6">
                     <label for="slotCount">No Of Slots</label>
                     <input type="number" class="form-control" id="slotCount">
@@ -105,9 +101,14 @@
                   <label for="slotDuration">Slot Duration (In Seconds)</label>
                   <input type="number" class="form-control" id="slotDuration">
               </div>
-              <div class="form-group col col-12 col-sm-6 col-md-6">
-                <label for="clientSelect">Client</label>
-                <select  class="js-example-basic-single clientSelect form-control" id="clientSelect" name="clientSelect">
+              <div class="form-group col col-12 col-sm-6 col-md-6 static-date-select">
+                <label for="time">Time</label>
+                <select id="time" class="form-control">
+                  <option value="06-24" selected>06.00 - 24.00</option>
+                  <option value="07-24" >07.00 - 24.00</option>
+                  <option value="08-24" >08.00 - 24.00</option>
+                  <option value="09-24" >09.00 - 24.00</option>
+                  <option value="10-24" >10.00 - 24.00</option>
                 </select>
             </div>
             </div>
@@ -134,7 +135,14 @@
                         </div>
                     </div>
                 </fieldset>
+                <div class="dynamicSlotSection hide">
+                  <h4>Dynamic Slot Config</h4>
+                  <div class="date-wise-list">
+                    <div class="row">
 
+                    </div>
+                  </div>
+                </div>
 
                 <br>
                 <button type="button" class="btn btn-danger view-listing">Cancel</button>
@@ -156,6 +164,20 @@ $(document).ready(function() {
     $('.add-compaign').click(function(e){
         addCompaign()
     })
+
+    $('input[type=radio][name=slotType]').change(function() {
+      console.log($(this).val());
+      let selectedSlotType = $(this).val();
+      if(selectedSlotType == 'D'){
+        $('.dynamicSlotSection').removeClass('hide');
+        $('.static-date-select').addClass('hide');
+      }else{
+        $('.dynamicSlotSection').addClass('hide');
+        $('.static-date-select').removeClass('hide');
+      }
+    });
+
+
   })
 
 
@@ -228,7 +250,7 @@ function loadCities(stateId){
       contentType : "application/json",
       dataType : "json",  
     }).done(function(data){
-      console.log("Resp:"+JSON.stringify(data));
+      // console.log("Resp:"+JSON.stringify(data));
       let citites= data.citites;
       $('#citySelect').empty().append(`<option class="" value=""></option>`)
       for(var i=0;i<citites.length;i++){
@@ -255,7 +277,7 @@ function loadCompaigns(){
       contentType : "application/json",
       dataType : "json",  
     }).done(function(data){
-      console.log("Resp:"+JSON.stringify(data));
+      // console.log("Resp:"+JSON.stringify(data));
       let dataSet = data.compaigns;
       
     
