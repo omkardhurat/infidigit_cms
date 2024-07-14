@@ -189,3 +189,9 @@ a {
   transform: scaleY(1);
   transition: transform 400ms ease 0ms;
 }
+
+.slot-card{
+    border: 1px solid grey;
+    padding: 10px;
+    margin-top: 10px;
+}

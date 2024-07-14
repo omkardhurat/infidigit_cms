@@ -1,391 +1,454 @@
 <%- include('../dashboard/sidemenu.ejs') %>
 
 
-    <section class="home-section">
-        <div class="home-content">
-            <i class='bx bx-menu'></i>
-            <span class="text">Compaign</span>
+<section class="home-section">
+  <div class="home-content">
+    <i class='bx bx-menu'></i>
+    <span class="text">Compaign</span>
+  </div>
+  <div class="listing">
+    <div class="row">
+      <div class="form-group create-btn-div col-xs-12 col-md-12 col-sm-12">
+        <button type="button" class="btn btn-info view-form">Create Compaign</button>
+      </div>
+    </div>
+    <div class="table-responsive">
+      <table id="example" class="display table table-responsive" style="width:100%">
+        <thead>
+          <tr>
+            <th>Sr No</th>
+            <th>Name</th>
+            <th>State</th>
+            <th>City</th>
+            <th>Created At</th>
+            <th>Updated At</th>
+          </tr>
+        </thead>
+      </table>
+    </div>
+  </div>
+  <div class="create-form hide">
+    <h4>Create Compaign</h4>
+    <br>
+    <form>
+      <div class="row">
+        <div class="form-group col-xs-12 col-md-12 col-sm-12">
+          <label for="compaignName">Compaign Name</label>
+          <input type="text" class="form-control" id="compaignName">
         </div>
-        <div class="listing">
+      </div>
+
+      <div class="row">
+        <div class="form-group form-panel col col-12 col-sm-6 col-md-6">
+          <label for="stateSelect">State</label>
+          <select class="js-example-basic-single stateSelect form-control" id="stateSelect" name="state">
+          </select>
+        </div>
+
+        <div class="form-group form-panel col col-12 col-sm-6 col-md-6">
+          <label for="citySelect">City</label>
+          <select class="js-example-basic-single citySelect form-control" id="citySelect" name="citySelect">
+          </select>
+        </div>
+      </div>
+      <div class="row">
+        <div class="form-group col col-12 col-sm-6 col-md-6">
+          <label for="networkSelect">Network</label>
+          <select class="js-example-basic-single networkSelect form-control" id="networkSelect" name="networkSelect">
+          </select>
+        </div>
+        <div class="form-group col col-12 col-sm-6 col-md-6">
+          <label for="channelSelect">Channel (Will Be Populated as per Network Selection)</label>
+          <select multiple class="js-example-basic-single channelSelect select2-multiple form-control"
+            id="channelSelect" name="channelSelect">
+
+          </select>
+        </div>
+      </div>
+      <div class="row">
+        <div class="form-group col col-12 col-sm-6 col-md-6">
+          <label for="product">Product</label>
+          <input type="text" class="form-control" id="product">
+        </div>
+        <div class="form-group col col-12 col-sm-6 col-md-6">
+          <label for="brand">Brand</label>
+          <input type="text" class="form-control" id="brand">
+        </div>
+      </div>
+      <div class="row static-date-select">
+        <div class="form-group col col-12 col-sm-6 col-md-6">
+          <label for="startDate">Start Date</label>
+          <input type="date" class="form-control" id="startDate">
+        </div>
+        <div class="form-group col col-12 col-sm-6 col-md-6">
+          <label for="endDate">End Date</label>
+          <input type="date" class="form-control" id="endDate">
+        </div>
+      </div>
+      <div class="row">
+        <div class="form-group col col-12 col-sm-6 col-md-6">
+          <label for="clientSelect">Client</label>
+          <select class="js-example-basic-single clientSelect form-control" id="clientSelect" name="clientSelect">
+          </select>
+        </div>
+
+        <div class="form-group col col-12 col-sm-6 col-md-6">
+          <label for="slotCount">No Of Slots</label>
+          <input type="number" class="form-control" id="slotCount">
+        </div>
+      </div>
+      <div class="row">
+        <div class="form-group col col-12 col-sm-6 col-md-6">
+          <label for="slotDuration">Slot Duration (In Seconds)</label>
+          <input type="number" class="form-control" id="slotDuration">
+        </div>
+        <div class="form-group col col-12 col-sm-6 col-md-6 static-date-select">
+          <label for="time">Time</label>
+          <select id="time" class="form-control">
+            <option value="06-24" selected>06.00 - 24.00</option>
+            <option value="07-24">07.00 - 24.00</option>
+            <option value="08-24">08.00 - 24.00</option>
+            <option value="09-24">09.00 - 24.00</option>
+            <option value="10-24">10.00 - 24.00</option>
+          </select>
+        </div>
+      </div>
+      <fieldset class="form-group">
+        <div class="row">
+          <div class="form-group col col-12 col-sm-6 col-md-6">
+            <label for="slotType">Slot Type</label>
+            <div>
+              <div class="form-check">
+                <input class="form-check-input" type="radio" name="slotType" id="staticSlot" value="S" checked>
+                <label class="form-check-label" for="staticSlot">
+                  Static
+                </label>
+              </div>
+              <div class="form-check">
+                <input class="form-check-input" type="radio" name="slotType" id="dynamicSlot" value="D">
+                <label class="form-check-label" for="dynamicSlot">
+                  Dynamic
+                </label>
+              </div>
+            </div>
+          </div>
+        </div>
+      </fieldset>
+      <div class="dynamicSlotSection hide">
+        <h4>Dynamic Slot Config</h4>
+        <div class="date-wise-list">
+          <div class="slot-card" id="slot-1">
             <div class="row">
-                <div class="form-group create-btn-div col-xs-12 col-md-12 col-sm-12">
-                    <button type="button" class="btn btn-info view-form">Create Compaign</button>
-                </div>
-            </div>
-            <div class="table-responsive">
-                <table id="example" class="display table table-responsive" style="width:100%">
-                  <thead>
-                      <tr>
-                          <th>Sr No</th>
-                          <th>Name</th>
-                          <th>State</th>
-                          <th>City</th>
-                          <th>Created At</th>
-                          <th>Updated At</th>
-                      </tr>
-                  </thead>
-                </table>
+              <div class="form-group col col-12 col-sm-6 col-md-6">
+                <label for="slotDate">Date</label>
+                <input type="date" class="form-control" id="slotDate">
               </div>
+              <div class="form-group col col-12 col-sm-6 col-md-6">
+                <label for="dSlotTotalCount">Total No Of Slots</label>
+                <input type="number" class="form-control" id="dSlotTotalCount">
+              </div>
+            </div>
+            <div class="row form-group" style="padding-left: 15px;">
+              <label for="dPrimaryTimeLbl">Time</label>
+            </div>
+            <div class="row">
+
+              <div class="form-group col col-12 col-sm-4 col-md-4">
+                <label for="dPrimaryCount">Morning (8AM to 12PM)</label>
+                <input type="number" class="form-control" id="dPrimaryCount">
+              </div>
+              <div class="form-group col col-12 col-sm-4 col-md-4">
+                <label for="dAfternoonCount">Afternoon (12PM to 6PM)</label>
+                <input type="number" class="form-control" id="dAfternoonCount">
+              </div>
+              <div class="form-group col col-12 col-sm-4 col-md-4">
+                <label for="dEveningCount">Evening (6PM to 12AM)</label>
+                <input type="number" class="form-control" id="dEveningCount">
+              </div>
+            </div>
+
+          </div>
+         
         </div>
-        <div class="create-form hide">
-            <h4>Create Compaign</h4>
-            <br>
-            <form>
-                <div class="row">
-                    <div class="form-group col-xs-12 col-md-12 col-sm-12">
-                        <label for="compaignName">Compaign Name</label>
-                        <input type="text" class="form-control" id="compaignName">
-                    </div>
-                </div>
-
-                <div class="row">
-                    <div class="form-group form-panel col col-12 col-sm-6 col-md-6">
-                        <label for="stateSelect">State</label>
-                        <select  class="js-example-basic-single stateSelect form-control" id="stateSelect" name="state">
-                        </select>
-                      </div>
-                
-                      <div class="form-group form-panel col col-12 col-sm-6 col-md-6">
-                        <label for="citySelect">City</label>
-                        <select class="js-example-basic-single citySelect form-control" id="citySelect" name="citySelect">
-                        </select>
-                      </div>
-                </div>
-                <div class="row">
-                    <div class="form-group col col-12 col-sm-6 col-md-6">
-                        <label for="networkSelect">Network</label>
-                        <select class="js-example-basic-single networkSelect form-control" id="networkSelect" name="networkSelect">
-                        </select>
-                    </div>
-                    <div class="form-group col col-12 col-sm-6 col-md-6">
-                        <label for="channelSelect">Channel (Will Be Populated as per Network Selection)</label>
-                        <select multiple class="js-example-basic-single channelSelect select2-multiple form-control" id="channelSelect" name="channelSelect">
-          
-                        </select>
-                    </div>
-                </div>
-                <div class="row">
-                    <div class="form-group col col-12 col-sm-6 col-md-6">
-                        <label for="product">Product</label>
-                        <input type="text" class="form-control" id="product">
-                    </div>
-                    <div class="form-group col col-12 col-sm-6 col-md-6">
-                        <label for="brand">Brand</label>
-                        <input type="text" class="form-control" id="brand">
-                    </div>
-                </div>
-                <div class="row static-date-select">
-                    <div class="form-group col col-12 col-sm-6 col-md-6">
-                        <label for="startDate">Start Date</label>
-                        <input type="date" class="form-control" id="startDate">
-                    </div>
-                    <div class="form-group col col-12 col-sm-6 col-md-6">
-                        <label for="endDate">End Date</label>
-                        <input type="date" class="form-control" id="endDate">
-                    </div>
-                </div>
-                <div class="row">
-                  <div class="form-group col col-12 col-sm-6 col-md-6">
-                    <label for="clientSelect">Client</label>
-                    <select  class="js-example-basic-single clientSelect form-control" id="clientSelect" name="clientSelect">
-                    </select>
-                </div>
-                  
-                  <div class="form-group col col-12 col-sm-6 col-md-6">
-                    <label for="slotCount">No Of Slots</label>
-                    <input type="number" class="form-control" id="slotCount">
-                </div>
-              </div>
-              <div class="row">
-                <div class="form-group col col-12 col-sm-6 col-md-6">
-                  <label for="slotDuration">Slot Duration (In Seconds)</label>
-                  <input type="number" class="form-control" id="slotDuration">
-              </div>
-              <div class="form-group col col-12 col-sm-6 col-md-6 static-date-select">
-                <label for="time">Time</label>
-                <select id="time" class="form-control">
-                  <option value="06-24" selected>06.00 - 24.00</option>
-                  <option value="07-24" >07.00 - 24.00</option>
-                  <option value="08-24" >08.00 - 24.00</option>
-                  <option value="09-24" >09.00 - 24.00</option>
-                  <option value="10-24" >10.00 - 24.00</option>
-                </select>
-            </div>
-            </div>
-                <fieldset class="form-group">
-                    <div class="row">
-                        <div class="form-group col col-12 col-sm-6 col-md-6">
-                            <label for="slotType">Slot Type</label>
-                            <div>
-                                <div class="form-check">
-                                    <input class="form-check-input" type="radio" name="slotType" id="staticSlot"
-                                        value="S" checked>
-                                    <label class="form-check-label" for="staticSlot">
-                                        Static
-                                    </label>
-                                </div>
-                                <div class="form-check">
-                                    <input class="form-check-input" type="radio" name="slotType" id="dynamicSlot"
-                                        value="D">
-                                    <label class="form-check-label" for="dynamicSlot">
-                                        Dynamic
-                                    </label>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </fieldset>
-                <div class="dynamicSlotSection hide">
-                  <h4>Dynamic Slot Config</h4>
-                  <div class="date-wise-list">
-                    <div class="row">
-
-                    </div>
-                  </div>
-                </div>
-
-                <br>
-                <button type="button" class="btn btn-danger view-listing">Cancel</button>
-                <button type="button" class="btn btn-primary add-compaign">Submit</button>
-            </form>
+        <div class="add-date-div" style="padding-top: 10px;">
+          <button type="button" class="btn btn-primary add-more-date">Add Date</button>
         </div>
-    </section>
+      </div>
+
+      <br>
+      <button type="button" class="btn btn-danger view-listing">Cancel</button>
+      <button type="button" class="btn btn-primary add-compaign">Submit</button>
+    </form>
+  </div>
+</section>
 
 
-    <script>
-
-$(document).ready(function() {
-  var states = [];
-  loadCompaigns();
-  $('.channelSelect').select2()
-    if(states.length == 0){
+<script>
+  $(document).ready(function () {
+    var states = [];
+    var dynamicDate = 0;
+    loadCompaigns();
+    $('.channelSelect').select2()
+    if (states.length == 0) {
       loadStates();
     }
-    $('.add-compaign').click(function(e){
-        addCompaign()
+    $('.add-compaign').click(function (e) {
+      addCompaign()
     })
 
-    $('input[type=radio][name=slotType]').change(function() {
+    $('input[type=radio][name=slotType]').change(function () {
       console.log($(this).val());
       let selectedSlotType = $(this).val();
-      if(selectedSlotType == 'D'){
+      if (selectedSlotType == 'D') {
         $('.dynamicSlotSection').removeClass('hide');
         $('.static-date-select').addClass('hide');
-      }else{
+      } else {
         $('.dynamicSlotSection').addClass('hide');
         $('.static-date-select').removeClass('hide');
       }
+    });
+
+    $('.add-more-date').click(function () {
+      addMoreDate();
     });
 
 
   })
 
 
-        $('.view-form').click(function () {
-            loadClients();
-            $('.listing').addClass('hide');
-            $('.create-form').removeClass('hide')
-        });
-        $('.view-listing').click(function () {
-            $('.listing').removeClass('hide');
-            $('.create-form').addClass('hide')
-        })
-
-
-function loadClients(){
-  $.ajax({
-      type : "GET",
-      url : "http://localhost:3000/compaign/getClients",
-      contentType : "application/json",
-      dataType : "json",  
-    }).done(function(data){
-      let clients = data.clients;
-      $('#clientSelect').empty().append(`<option class="" value=""></option>`)
-      for(var i=0;i<clients.length;i++){
-        $('#clientSelect').append(`<option class="" value="${clients[i].id}" data-id="${clients[i].id}">${clients[i].name}</option>`)
-      }
-      $('.clientSelect').select2({
-        placeholder:'Select Client'
-      })
-      .on('select2:select', function(e) {
-        console.log('Selecting: ' , e.params.data.id);
-        
-      });;
-      $('.select2-selection').addClass('form-control');
-      return;
-  });
-}
-
-function loadStates(){
-  $.ajax({
-      type : "GET",
-      url : "http://localhost:3000/config/states",
-      contentType : "application/json",
-      dataType : "json",  
-    }).done(function(data){
-      states = data.states;
-      $('#stateSelect').empty().append(`<option class="" value=""></option>`)
-      for(var i=0;i<states.length;i++){
-        $('#stateSelect').append(`<option class="" value="${states[i].id}" data-id="${states[i].id}">${states[i].name}</option>`)
-      }
-      $('.stateSelect').select2({
-        placeholder:'Select State'
-      })
-      .on('select2:select', function(e) {
-        console.log('Selecting: ' , e.params.data.id);
-        if(e.params.data.id != ''){
-        loadCities(e.params.data.id)
-        }
-      });;
-      $('.select2-selection').addClass('form-control');
-      return;
-  });
-}
-
-function loadCities(stateId){
-  console.log("state:"+stateId);
-  $.ajax({
-      type : "GET",
-      url : "http://localhost:3000/config/cities/"+stateId,
-      contentType : "application/json",
-      dataType : "json",  
-    }).done(function(data){
-      // console.log("Resp:"+JSON.stringify(data));
-      let citites= data.citites;
-      $('#citySelect').empty().append(`<option class="" value=""></option>`)
-      for(var i=0;i<citites.length;i++){
-        $('#citySelect').append(`<option class="" value="${citites[i].id}" data-id="${citites[i].id}">${citites[i].name}</option>`)
-      }
-      $('.citySelect').select2({
-        placeholder: 'Select City'
-      })
-      .on('select2:select', function(e) {
-        console.log('Selecting: ' , e.params.data.id);
-        if(e.params.data.id != ''){
-            loadNetworks(e.params.data.id)
-        }
-      });;
-      $('.select2-selection').addClass('form-control');
-      return;
-  });
-}
-
-function loadCompaigns(){
-  $.ajax({
-      type : "GET",
-      url : "http://localhost:3000/compaign/get",
-      contentType : "application/json",
-      dataType : "json",  
-    }).done(function(data){
-      // console.log("Resp:"+JSON.stringify(data));
-      let dataSet = data.compaigns;
-      
-    
-    new DataTable('#example', {
-      data: dataSet, 
-      "retrieve": true,
-      columns: [
-        { data: 'id' },
-        { data: 'name' },
-        { data: 'state' },
-        { data: 'city' },
-        { data: 'created_at' },
-        { data: 'updated_at' }
-      ]
-    });
-      return;
-  });
-
  
 
-}
+  $('.view-form').click(function () {
+    loadClients();
+    $('.listing').addClass('hide');
+    $('.create-form').removeClass('hide')
+  });
+  $('.view-listing').click(function () {
+    $('.listing').removeClass('hide');
+    $('.create-form').addClass('hide')
+  })
 
-function loadNetworks(cityId){
-  console.log("state:"+cityId);
-  $.ajax({
-      type : "GET",
-      url : "http://localhost:3000/network/getByCity?city="+cityId,
-      contentType : "application/json",
-      dataType : "json",  
-    }).done(function(data){
-      console.log("Resp:"+JSON.stringify(data));
-      let networks= data.networks;
-      $('#networkSelect').empty().append(`<option class="" value=""></option>`)
-      for(var i=0;i<networks.length;i++){
-        $('#networkSelect').append(`<option class="" value="${networks[i].id}" data-id="${networks[i].id}">${networks[i].name}</option>`)
+
+  function addMoreDate() {
+    // alert(this)
+    let existingDates = $('.slot-card');
+    let noOfDates = existingDates.length;
+    let newDiv = existingDates[noOfDates-1].outerHTML;
+    $('.date-wise-list').append(newDiv);
+    let lastDateAdded = $('.slot-card')[existingDates.length];
+    console.log(lastDateAdded.id.split('-')[1]);
+    let lastAddedId = parseInt(lastDateAdded.id.split('-')[1]);
+    lastDateAdded.id = 'slot-'+(lastAddedId+1);
+  }
+
+
+  function loadClients() {
+    $.ajax({
+      type: "GET",
+      url: "http://localhost:3000/compaign/getClients",
+      contentType: "application/json",
+      dataType: "json",
+    }).done(function (data) {
+      let clients = data.clients;
+      $('#clientSelect').empty().append(`<option class="" value=""></option>`)
+      for (var i = 0; i < clients.length; i++) {
+        $('#clientSelect').append(
+          `<option class="" value="${clients[i].id}" data-id="${clients[i].id}">${clients[i].name}</option>`)
       }
-      $('.networkSelect').select2({
-        placeholder: 'Select Network'
-      })
-      .on('select2:select', function(e) {
-        console.log('Selecting: ' , e.params.data.id);
-        if(e.params.data.id != ''){
-            loadChannels(e.params.data.id)
-        }
-      });;
+      $('.clientSelect').select2({
+          placeholder: 'Select Client'
+        })
+        .on('select2:select', function (e) {
+          console.log('Selecting: ', e.params.data.id);
+
+        });;
       $('.select2-selection').addClass('form-control');
       return;
-  });
-}
+    });
+  }
 
-function loadChannels(networks){
-  console.log("state:"+networks);
-  $.ajax({
-      type : "GET",
-      url : "http://localhost:3000/channel/getByNetwork?network="+networks,
-      contentType : "application/json",
-      dataType : "json",  
-    }).done(function(data){
-      console.log("Resp:"+JSON.stringify(data));
-      let channels= data.channels;
+  function loadStates() {
+    $.ajax({
+      type: "GET",
+      url: "http://localhost:3000/config/states",
+      contentType: "application/json",
+      dataType: "json",
+    }).done(function (data) {
+      states = data.states;
+      $('#stateSelect').empty().append(`<option class="" value=""></option>`)
+      for (var i = 0; i < states.length; i++) {
+        $('#stateSelect').append(
+          `<option class="" value="${states[i].id}" data-id="${states[i].id}">${states[i].name}</option>`)
+      }
+      $('.stateSelect').select2({
+          placeholder: 'Select State'
+        })
+        .on('select2:select', function (e) {
+          console.log('Selecting: ', e.params.data.id);
+          if (e.params.data.id != '') {
+            loadCities(e.params.data.id)
+          }
+        });;
+      $('.select2-selection').addClass('form-control');
+      return;
+    });
+  }
+
+  function loadCities(stateId) {
+    console.log("state:" + stateId);
+    $.ajax({
+      type: "GET",
+      url: "http://localhost:3000/config/cities/" + stateId,
+      contentType: "application/json",
+      dataType: "json",
+    }).done(function (data) {
+      // console.log("Resp:"+JSON.stringify(data));
+      let citites = data.citites;
+      $('#citySelect').empty().append(`<option class="" value=""></option>`)
+      for (var i = 0; i < citites.length; i++) {
+        $('#citySelect').append(
+          `<option class="" value="${citites[i].id}" data-id="${citites[i].id}">${citites[i].name}</option>`)
+      }
+      $('.citySelect').select2({
+          placeholder: 'Select City'
+        })
+        .on('select2:select', function (e) {
+          console.log('Selecting: ', e.params.data.id);
+          if (e.params.data.id != '') {
+            loadNetworks(e.params.data.id)
+          }
+        });;
+      $('.select2-selection').addClass('form-control');
+      return;
+    });
+  }
+
+  function loadCompaigns() {
+    $.ajax({
+      type: "GET",
+      url: "http://localhost:3000/compaign/get",
+      contentType: "application/json",
+      dataType: "json",
+    }).done(function (data) {
+      // console.log("Resp:"+JSON.stringify(data));
+      let dataSet = data.compaigns;
+
+
+      new DataTable('#example', {
+        data: dataSet,
+        "retrieve": true,
+        columns: [{
+            data: 'id'
+          },
+          {
+            data: 'name'
+          },
+          {
+            data: 'state'
+          },
+          {
+            data: 'city'
+          },
+          {
+            data: 'created_at'
+          },
+          {
+            data: 'updated_at'
+          }
+        ]
+      });
+      return;
+    });
+
+
+
+  }
+
+  function loadNetworks(cityId) {
+    console.log("state:" + cityId);
+    $.ajax({
+      type: "GET",
+      url: "http://localhost:3000/network/getByCity?city=" + cityId,
+      contentType: "application/json",
+      dataType: "json",
+    }).done(function (data) {
+      console.log("Resp:" + JSON.stringify(data));
+      let networks = data.networks;
+      $('#networkSelect').empty().append(`<option class="" value=""></option>`)
+      for (var i = 0; i < networks.length; i++) {
+        $('#networkSelect').append(
+          `<option class="" value="${networks[i].id}" data-id="${networks[i].id}">${networks[i].name}</option>`)
+      }
+      $('.networkSelect').select2({
+          placeholder: 'Select Network'
+        })
+        .on('select2:select', function (e) {
+          console.log('Selecting: ', e.params.data.id);
+          if (e.params.data.id != '') {
+            loadChannels(e.params.data.id)
+          }
+        });;
+      $('.select2-selection').addClass('form-control');
+      return;
+    });
+  }
+
+  function loadChannels(networks) {
+    console.log("state:" + networks);
+    $.ajax({
+      type: "GET",
+      url: "http://localhost:3000/channel/getByNetwork?network=" + networks,
+      contentType: "application/json",
+      dataType: "json",
+    }).done(function (data) {
+      console.log("Resp:" + JSON.stringify(data));
+      let channels = data.channels;
       $('#channelSelect').empty().append(`<option class="" value=""></option>`)
-      for(var i=0;i<channels.length;i++){
-        $('#channelSelect').append(`<option class="" value="${channels[i].id}" data-id="${channels[i].id}">${channels[i].name}</option>`)
+      for (var i = 0; i < channels.length; i++) {
+        $('#channelSelect').append(
+          `<option class="" value="${channels[i].id}" data-id="${channels[i].id}">${channels[i].name}</option>`)
       }
       $('.channelSelect').select2({
         placeholder: 'Select Channels'
       })
       $('.select2-selection').addClass('form-control');
       return;
-  });
-}
-
-function addCompaign(){
-//   network, channels, product, brand, startDate, endDate
-  let reqBody = {
-    state: $('#stateSelect').val(),
-    city: $('#citySelect').val(),
-    name: $('#compaignName').val(),
-    network: $('#networkSelect').val(),
-    channels: $('#channelSelect').val(),
-    product: $('#product').val(),
-    brand: $('#brand').val(),
-    startDate: $('#startDate').val(),
-    endDate: $('#endDate').val(),
-    time: $('#time').val(),
-    slotCount: $('#slotCount').val(),
-    slotDuration: $('#slotDuration').val(),
-    client: $('#clientSelect').val(),
-    slotType: $("input[name='slotType']:checked").val()
+    });
   }
-  $.ajax({
-      type : "POST",
-      url : "http://localhost:3000/compaign/add",
+
+  function addCompaign() {
+    //   network, channels, product, brand, startDate, endDate
+    let reqBody = {
+      state: $('#stateSelect').val(),
+      city: $('#citySelect').val(),
+      name: $('#compaignName').val(),
+      network: $('#networkSelect').val(),
+      channels: $('#channelSelect').val(),
+      product: $('#product').val(),
+      brand: $('#brand').val(),
+      startDate: $('#startDate').val(),
+      endDate: $('#endDate').val(),
+      time: $('#time').val(),
+      slotCount: $('#slotCount').val(),
+      slotDuration: $('#slotDuration').val(),
+      client: $('#clientSelect').val(),
+      slotType: $("input[name='slotType']:checked").val()
+    }
+    $.ajax({
+      type: "POST",
+      url: "http://localhost:3000/compaign/add",
       data: reqBody,
-      success: function(data){
+      success: function (data) {
         console.log(JSON.stringify(data));
         // $('.view-listing').trigger('click');
         alert(data.message);
         window.location.reload();
       },
-      error: function(xhr, ajaxOptions, thrownError) {
+      error: function (xhr, ajaxOptions, thrownError) {
         alert(xhr.responseText);
       }
     });
-}
+  }
+</script>
 
-
-
-    </script>
-
-    <%- include('../dashboard/toggle.ejs') %>
+<%- include('../dashboard/toggle.ejs') %>
