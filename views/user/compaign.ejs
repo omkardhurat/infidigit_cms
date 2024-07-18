@@ -434,21 +434,96 @@
       client: $('#clientSelect').val(),
       slotType: $("input[name='slotType']:checked").val()
     }
-    $.ajax({
-      type: "POST",
-      url: "http://localhost:3000/compaign/add",
-      data: reqBody,
-      success: function (data) {
-        console.log(JSON.stringify(data));
-        // $('.view-listing').trigger('click');
-        alert(data.message);
-        window.location.reload();
-      },
-      error: function (xhr, ajaxOptions, thrownError) {
-        alert(xhr.responseText);
+    let slotArray = [];
+
+    let dDatesCount = $('.slot-card').length;
+    let dateArray = [];
+    var isFormValid = true;
+
+    for (let index = 1; index <= dDatesCount; index++) {
+      let slotData = $(`#slot-${index}`)[0];
+      let date = $(`#slot-${index} #slotDate`).val();
+      let totalCount = $(`#slot-${index} #dSlotTotalCount`).val();
+      let morningCnt = $(`#slot-${index} #dPrimaryCount`).val();
+      let afterCnt = $(`#slot-${index} #dAfternoonCount`).val();
+      let evenCnt = $(`#slot-${index} #dEveningCount`).val();
+      if(date == ''){
+        alert("Please enter proper date at slot "+index);
+        isFormValid= false;
+        break;
       }
-    });
-  }
+
+      if(totalCount == ''){
+        alert("Please enter proper total count at slot "+index);
+        isFormValid= false;
+        break;
+      }
+
+      if(morningCnt == ''){
+        alert("Please enter proper Morning count at slot "+index);
+        isFormValid= false;
+        break;
+      }
+
+      if(afterCnt == ''){
+        alert("Please enter proper Afternoon count at slot "+index);
+        isFormValid= false;
+        break;
+      }
+
+      if(evenCnt == ''){
+        alert("Please enter proper Evening count at slot "+index);
+        isFormValid= false;
+        break;
+      }
+
+      if(parseInt(totalCount) != (parseInt(morningCnt) + parseInt(afterCnt) + parseInt(evenCnt))){
+        alert("Total count must be match with addition of individual counts at slot "+index);
+        isFormValid= false;
+        break;
+      }
+
+      dateArray.push(date);
+      
+      let slotObject = {
+        id: index,
+        date: date,
+        totalSlots: totalCount,
+        morningCount: morningCnt,
+        afternoonCount: afterCnt,
+        eveningCount: evenCnt,
+        duration: $('#slotDuration').val()
+      }
+      slotArray.push(slotObject)
+    }
+
+    const uniqueDates = new Set(dateArray);
+
+    if (uniqueDates.size !== dateArray.length) {
+      console.log("Duplicates found!");
+      isFormValid = false;
+      alert("Please enter unique dates.. Duplicate Dates found..");
+    }
+    if(isFormValid){
+      console.log(JSON.stringify(slotArray));
+      $.ajax({
+        type: "POST",
+        url: "http://localhost:3000/compaign/add",
+        data: reqBody,
+        success: function (data) {
+          console.log(JSON.stringify(data));
+          // $('.view-listing').trigger('click');
+          alert(data.message);
+          window.location.reload();
+        },
+        error: function (xhr, ajaxOptions, thrownError) {
+          alert(xhr.responseText);
+        }
+      });
+  
+      }
+
+    }
 </script>
 
 <%- include('../dashboard/toggle.ejs') %>
