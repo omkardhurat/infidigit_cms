@@ -130,19 +130,11 @@ let validateCompaignDynamic = async (compaign) => {
   } else if (compaign.slotType == undefined || compaign.slotType == null || compaign.slotType == '') {
     return false;
   } else {
-    let selectedDates = compaign.selectedDates;
-    selectedDates.sort(function(a,b) {
-      a = a.split('-').reverse().join('');
-      b = b.split('-').reverse().join('');
-      return a > b ? 1 : a < b ? -1 : 0;
-    });
-    console.log("Unique dates -> "+JSON.stringify(selectedDates));
     return true;
   }
 }
 
 let fetchExistingSlots = async (compaign, slotDate, connection, selectedChannel, selectedTime, endTime) => {
-  // let slotFetchQuery = `select * from slots where (TIME('${selectedTime}') between TIME(start_time) and TIME(end_time) OR TIME('${endTimeF}') between TIME(start_time) and TIME(end_time)) and date = '${moment(slotDate).format("YYYY-MM-DD")}' and channels=${selectedChannel};`;
   let startTimeF = selectedTime.format('HH:mm:ss');
   let endTimeF = endTime.format('HH:mm:ss')
   let slotFetchQuery = `select * from slots where 
@@ -152,10 +144,7 @@ let fetchExistingSlots = async (compaign, slotDate, connection, selectedChannel,
                           )
                           and date = '${moment(slotDate).format("YYYY-MM-DD")}' 
                           and channels=${selectedChannel}`;
-  // SELECT TIME(start_time-20), start_time, end_time, TIME(end_time+1) FROM cms_app.slots where date = '2024-07-01';
-
-  // select * from slots where TIME('06:01:34') between start_time-20 and end_time+1 and date = '2024-07-01' and channels=14;
-
+ 
   let [existSlotsData] = await connection.query(slotFetchQuery);
   console.log(JSON.stringify(existSlotsData));
   if (existSlotsData.length != 0) {
@@ -165,8 +154,6 @@ let fetchExistingSlots = async (compaign, slotDate, connection, selectedChannel,
 }
 
 let generateSlots = async (compaign, connection) => {
-  // const dayStart = new Date(0, 0, 0); // Start of the day (midnight)
-  // const dayEnd = new Date(23, 59, 59, 999); // End of the day
   try {
     let slotDuration = compaign.slotDuration;
     let slotCount = parseInt(compaign.slotCount);
@@ -190,21 +177,13 @@ let generateSlots = async (compaign, connection) => {
       const selectedChannel = channelsArray[channel];
       console.log("selected channel::" + selectedChannel + ":MstartDate:" + MstartDate);
       for (var startDate = new Date(compaign.startDate); startDate <= endDate; startDate.setDate(startDate.getDate() + 1)) {
-        // console.log('Current Date:', startDate +"  --- "+ MstartDate);
         const startTime = moment().startOf('day').add(parseInt(compaignTime[0]), 'hours'); // Start at 6 AM
         const endTime = moment().endOf('day').add((parseInt(compaignTime[1]) - 1), 'hours').add(59, 'minutes'); // End at 6 PM (excluding the last 6 hours)
-        // const startTime = parseInt(compaignTime[0]) // Start at 6 AM
-        // const endTime = parseInt(compaignTime[1]) // End at 6 PM (excluding the last 6 hours)
-
+        
         let index = 0;
         let randomNumber = (Math.random() * (5 - 1) + 1);
-        // do {
-        //   randomNumber = getRandomNumber(usedNumbers);
-        // } while (usedNumbers.includes(randomNumber)); // Ensure non-repeating number
-        // console.log("Ramndom Numner::"+randomNumber);
-        // usedNumbers.push(randomNumber);
+      
         dateIndex++;
-        // console.log(dateIndex);
         let currentSlot = startTime.clone().add((randomNumber * 60 * 1000), 'milliseconds');
         let endSlot = startTime.clone().add((randomNumber * 60 * 1000), 'milliseconds').add(slotDuration);
         // let existingSlots = await fetchExistingSlots(compaign, startDate, connection, selectedChannel, currentSlot.format('HH:mm:ss.SSS'));
@@ -214,23 +193,12 @@ let generateSlots = async (compaign, connection) => {
           endSlot = currentSlot.clone().add(slotDuration)
           console.log("slot in loop::::" + currentSlot.format('HH:mm:ss'));
         }
-        // do{
-        //   currentSlot = currentSlot.add(((Math.random() * (4- 1) + 1) * 30 * 1000), 'milliseconds');
-        //   console.log("slot in loop::::"+currentSlot.format('HH:mm:ss'));
-        // }
-        // while(!await fetchExistingSlots(compaign, startDate, connection, selectedChannel, currentSlot.format('HH:mm:ss'), currentSlot.add(slotDuration).format('HH:mm:ss'))) 
-        // let endSlot = currentSlot;
+        
         console.log("selected slot::===" + currentSlot.format('HH:mm:ss'));
         for (let slotIndex = 0; slotIndex < slotCount; slotIndex++) {
-          // slots.push({
-          //   compaignId: compaign.compaignId,
-          //   date: moment(startDate).format("DD-MM-YYYY"),
-          //   start_time: currentSlot.format('HH:mm:ss'), // Timestamp with milliseconds
-          //   end_time: currentSlot.add(slotDuration).format('HH:mm:ss')
-          // });
+          
           slotInsertValues.push(`('${currentSlot.format('HH:mm:ss')}', '${endSlot.format('HH:mm:ss')}', ${compaign.compaignId}, '${new Date(startDate).toISOString().slice(0, 19).replace('T', ' ')}', ${compaign.network}, '${selectedChannel}', ${compaign.slotDuration})`)
           index++;
-          // console.log(index);
           let loopRandomNumber = (Math.random() * (4 - 1) + 1);
           if (currentSlot.isBefore(endTime)) {
             currentSlot = currentSlot.add(slotDuration + (gapDuration));
@@ -248,27 +216,10 @@ let generateSlots = async (compaign, connection) => {
             }
           }
         }
-        // console.log(randomNumber);
-        // while (currentSlot.isBefore(endTime)) {
-        //   slots.push({
-        //     compaignId: compaign.compaignId,
-        //     date: moment(startDate).format("DD-MM-YYYY"),
-        //     start_time: currentSlot.format('HH:mm:ss.SSS'), // Timestamp with milliseconds
-        //     end_time: currentSlot.add(slotDuration).format('HH:mm:ss.SSS')
-        //   });
-        //   slotInsertValues.push(`('${currentSlot.format('HH:mm:ss.SSS')}', '${currentSlot.add(slotDuration).format('HH:mm:ss.SSS')}', ${compaign.compaignId}, '${new Date(startDate).toISOString().slice(0, 19).replace('T', ' ')}')`)
-        //   index++;
-        //   console.log(index);
-        //   if (index == slotCount) {
-        //     break;
-        //   }
-        //   currentSlot = currentSlot.add(slotDuration + (gapDuration));
-        // }
 
       }
     }
 
-    // console.log(JSON.stringify(slots));
     return slotInsertValues;
   } catch (error) {
     console.log(error);
@@ -343,7 +294,37 @@ router.post('/add', isLoggedIn, async function (req, res, next) {
     let validateData = await validateCompaignDynamic(compaign);
     // console.log(validateData);
     if (validateData) {
-      res.status(200).json({ status: 200, message: 'Dynamic Work in progress' });
+      let selectedDates = compaign.selectedDates;
+      selectedDates.sort(function(a,b) {
+        a = a.split('-').reverse().join('');
+        b = b.split('-').reverse().join('');
+        return a > b ? 1 : a < b ? -1 : 0;
+      });
+      console.log("Unique dates -> "+JSON.stringify(selectedDates));
+      let startDateFormatted = moment(compaign.startDate, "YYYY-MM-DD");
+      let endDateFormatted = moment(compaign.endDate, "YYYY-MM-DD");
+      let selectedFirstDate = moment(selectedDates[0], "YYYY-MM-DD");
+      let selectedLastDate = moment(selectedDates[selectedDates.length-1], "YYYY-MM-DD");
+      if(!selectedFirstDate.isBetween(startDateFormatted, endDateFormatted) || !selectedLastDate.isBetween(startDateFormatted, endDateFormatted)){
+        res.status(400).send(`Please enter valid Dates between ${startDateFormatted} and ${endDateFormatted}`);
+      }
+      compaign.channels = compaign.channels.join(",");
+      // console.log(compaign.channels);
+
+      try {
+        await connection.query('START TRANSACTION');
+        var startDate = moment(compaign.startDate);
+        var endDate = moment(compaign.endDate);
+        await connection.query('COMMIT');
+      }catch (error) {
+        await connection.query('ROLLBACK');
+        console.log(error);
+        res.status(500).json({ status: 500, message: 'Something Went wrong. Please contact administrator' });
+      } finally {
+        await connection.end();
+      }
+      res.status(200).json({ status: 200, message: 'Compaign Added Succussfully' });
+
     } else {
       res.status(400).send('Please enter valid data to add Compaign');
     }
