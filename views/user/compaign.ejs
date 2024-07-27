@@ -180,6 +180,7 @@
         <button type="button" class="btn btn-primary add-compaign">Submit</button>
       </form>
     </div>
+   
   </section>
 
 
@@ -418,6 +419,7 @@
 
     function addCompaign() {
       //   network, channels, product, brand, startDate, endDate
+              $(".loader").show();
 
       let state = $('#stateSelect').val();
       let city = $('#citySelect').val();
@@ -605,7 +607,11 @@
           isFormValid = false;
           alert("Please enter unique dates.. Duplicate Dates found..");
         }
+        
         reqBody.slotArray = slotArray;
+        reqBody.selectedDates = dateArray;
+        console.log("reqBody.selectedDates -> "+reqBody.selectedDates);
+        
       }
 
 
@@ -614,6 +620,9 @@
           type: "POST",
           url: "http://localhost:3000/compaign/add",
           data: reqBody,
+          beforeSend: function() {
+              $(".loader").show();
+          },
           success: function (data) {
             console.log(JSON.stringify(data));
             // $('.view-listing').trigger('click');
@@ -622,6 +631,8 @@
           },
           error: function (xhr, ajaxOptions, thrownError) {
             alert(xhr.responseText);
+              $(".loader").hide();
+
           }
         });
 

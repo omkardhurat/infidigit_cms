@@ -104,6 +104,43 @@ let validateCompaign = async (compaign) => {
   }
 }
 
+let validateCompaignDynamic = async (compaign) => {
+  if (compaign.name == undefined || compaign.name == null || compaign.name == '') {
+    return false;
+  } else if (compaign.state == undefined || compaign.state == null || compaign.state == '') {
+    return false;
+  } else if (compaign.city == undefined || compaign.city == null || compaign.city == '') {
+    return false;
+  } else if (compaign.network == undefined || compaign.network == null || compaign.network == '') {
+    return false;
+  } else if (compaign.channels == undefined || compaign.channels == null || compaign.channels.length == 0) {
+    return false;
+  } else if (compaign.product == undefined || compaign.product == null || compaign.product == '') {
+    return false;
+  } else if (compaign.brand == undefined || compaign.brand == null || compaign.brand == '') {
+    return false;
+  } else if (compaign.startDate == undefined || compaign.startDate == null || compaign.startDate == '') {
+    return false;
+  } else if (compaign.endDate == undefined || compaign.endDate == null || compaign.endDate == '') {
+    return false;
+  } else if (compaign.slotCount == undefined || compaign.slotCount == null || compaign.slotCount == '') {
+    return false;
+  } else if (compaign.client == undefined || compaign.client == null || compaign.client == '') {
+    return false;
+  } else if (compaign.slotType == undefined || compaign.slotType == null || compaign.slotType == '') {
+    return false;
+  } else {
+    let selectedDates = compaign.selectedDates;
+    selectedDates.sort(function(a,b) {
+      a = a.split('-').reverse().join('');
+      b = b.split('-').reverse().join('');
+      return a > b ? 1 : a < b ? -1 : 0;
+    });
+    console.log("Unique dates -> "+JSON.stringify(selectedDates));
+    return true;
+  }
+}
+
 let fetchExistingSlots = async (compaign, slotDate, connection, selectedChannel, selectedTime, endTime) => {
   // let slotFetchQuery = `select * from slots where (TIME('${selectedTime}') between TIME(start_time) and TIME(end_time) OR TIME('${endTimeF}') between TIME(start_time) and TIME(end_time)) and date = '${moment(slotDate).format("YYYY-MM-DD")}' and channels=${selectedChannel};`;
   let startTimeF = selectedTime.format('HH:mm:ss');
@@ -303,6 +340,13 @@ router.post('/add', isLoggedIn, async function (req, res, next) {
     }
   } else {
     console.log("in Dynamic");
+    let validateData = await validateCompaignDynamic(compaign);
+    // console.log(validateData);
+    if (validateData) {
+      res.status(200).json({ status: 200, message: 'Dynamic Work in progress' });
+    } else {
+      res.status(400).send('Please enter valid data to add Compaign');
+    }
   }
 
 
