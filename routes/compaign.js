@@ -228,16 +228,60 @@ let generateSlots = async (compaign, connection) => {
 
 }
 
-function getRandomNumber(usedNumbers) {
-  const availableNumbers = [];
-  for (let i = 1; i <= 10; i++) {
-    if (!usedNumbers.includes(i)) {
-      availableNumbers.push(i);
+let generateSlotsDynamic = async (compaign, singleSlot, connection) => {
+  try {
+    let slotDuration = singleSlot.slotDuration;
+    // let slotCount = parseInt(compaign.totalSlots);
+    slotDuration = slotDuration * 1000; // slotDuration seconds in milliseconds
+    
+    let compaignTime, slotCount;
+    for(var i=0;i<3;i++){
+      if(i==0){
+        //for Morning slots
+        if(singleSlot.morningCount != 0){
+          slotCount = singleSlot.morningCount;
+          compaignTime = ("08.00 - 12.00").split("-");
+        }
+      }else if(i==1){
+        //for afternoon slots
+        if(singleSlot.afternoonCount != 0){
+          slotCount = singleSlot.afternoonCount;
+          compaignTime = ("12.00 - 18.00").split("-");
+        }
+      }else{
+        //for evening slots
+        if(singleSlot.eveningCount != 0){
+          slotCount = singleSlot.eveningCount;
+          compaignTime = ("18.00 - 24.00").split("-");
+        }
+      }
+
     }
+
+    let totalHours = parseInt(compaignTime[1]) - parseInt(compaignTime[0])
+    console.log(JSON.stringify(compaignTime) + ' - ' + totalHours);
+    let gapMinutes = (((totalHours - 1) * 60) / slotCount);
+    const gapDuration = gapMinutes * 60 * 1000; // 1 hour in milliseconds
+
+    
+    let startDate = new Date(singleSlot.date);
+    let slots = [];
+    let slotInsertValues = [];
+    const usedNumbers = [];
+    let dateIndex = 0;
+
+    let channelsArray = compaign.channels.split(",");
+    console.log(channelsArray.length);
+    for (let channel = 0; channel < channelsArray.length; channel++) {
+
+    }
+
+    return slotInsertValues;
+  } catch (error) {
+    console.log(error);
+    throw error;
   }
 
-  const randomIndex = Math.floor(Math.random() * availableNumbers.length);
-  return availableNumbers[randomIndex];
 }
 
 router.post('/add', isLoggedIn, async function (req, res, next) {
