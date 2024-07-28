@@ -495,16 +495,18 @@
         return false;
       }
 
-      if (time == '') {
-        alert("Please Select time");
-        isFormValid = false;
-        return false;
-      }
+      if(slotType == 'S'){
+        if (time == '') {
+          alert("Please Select time");
+          isFormValid = false;
+          return false;
+        }
 
-      if (slotCount == '') {
-        alert("Please enter slot count");
-        isFormValid = false;
-        return false;
+        if (slotCount == '') {
+          alert("Please enter slot count");
+          isFormValid = false;
+          return false;
+        }
       }
 
       if (slotDuration == '') {
