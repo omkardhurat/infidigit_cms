@@ -144,9 +144,9 @@ let fetchExistingSlots = async (compaign, slotDate, connection, selectedChannel,
                           and channels=${selectedChannel}`;
  
   let [existSlotsData] = await connection.query(slotFetchQuery);
-  console.log(JSON.stringify(existSlotsData));
+  // console.log(JSON.stringify(existSlotsData));
   if (existSlotsData.length != 0) {
-    console.log(slotFetchQuery);
+    // console.log(slotFetchQuery);
   }
   return (existSlotsData.length != 0);
 }
@@ -189,10 +189,10 @@ let generateSlots = async (compaign, connection) => {
           let newRandomNumber = (Math.random() * (4 - 1) + 1);
           currentSlot = currentSlot.add((newRandomNumber * 60 * 1000), 'milliseconds');
           endSlot = currentSlot.clone().add(slotDuration)
-          console.log("slot in loop::::" + currentSlot.format('HH:mm:ss'));
+          // console.log("slot in loop::::" + currentSlot.format('HH:mm:ss'));
         }
         
-        console.log("selected slot::===" + currentSlot.format('HH:mm:ss'));
+        // console.log("selected slot::===" + currentSlot.format('HH:mm:ss'));
         for (let slotIndex = 0; slotIndex < slotCount; slotIndex++) {
           
           slotInsertValues.push(`('${currentSlot.format('HH:mm:ss')}', '${endSlot.format('HH:mm:ss')}', ${compaign.compaignId}, '${new Date(startDate).toISOString().slice(0, 19).replace('T', ' ')}', ${compaign.network}, '${selectedChannel}', ${compaign.slotDuration})`)
@@ -203,14 +203,14 @@ let generateSlots = async (compaign, connection) => {
             endSlot = currentSlot.clone().add(slotDuration)
             while (await fetchExistingSlots(compaign, startDate, connection, selectedChannel, currentSlot, endSlot)) {
               currentSlot = currentSlot.add((loopRandomNumber * 60 * 1000), 'milliseconds');
-              console.log("slot in loop::::" + currentSlot.format('HH:mm:ss'));
+              // console.log("slot in loop::::" + currentSlot.format('HH:mm:ss'));
             }
           } else {
             currentSlot = currentSlot.add(slotDuration - (gapDuration / 2));
             endSlot = currentSlot.clone().add(slotDuration)
             while (await fetchExistingSlots(compaign, startDate, connection, selectedChannel, currentSlot, endSlot)) {
               currentSlot = currentSlot.add((loopRandomNumber * 60 * 1000), 'milliseconds');
-              console.log("slot in loop::::" + currentSlot.format('HH:mm:ss'));
+              // console.log("slot in loop::::" + currentSlot.format('HH:mm:ss'));
             }
           }
         }
@@ -238,15 +238,15 @@ let generateDynamicInternalSlots = async (compaign, singleSlot, connection, slot
     let slots = [];
     const usedNumbers = [];
     let dateIndex = 0;
-
+    const startTime = moment().startOf('day').add(parseInt(singleSlot.compaignTime[0]), 'hours'); // Start at 6 AM
+    const endTime = moment().endOf('day').add((parseInt(singleSlot.compaignTime[1]) - 1), 'hours').add(59, 'minutes'); // End at 6 PM (excluding the last 6 hours)
+    
     let channelsArray = compaign.channels.split(",");
-    console.log(channelsArray.length);
+    // console.log(channelsArray.length);
     for (let channel = 0; channel < channelsArray.length; channel++) {
       const selectedChannel = channelsArray[channel];
-      console.log("Selected channel->"+selectedChannel);
-      const startTime = moment().startOf('day').add(parseInt(singleSlot.compaignTime[0]), 'hours'); // Start at 6 AM
-      const endTime = moment().endOf('day').add((parseInt(singleSlot.compaignTime[1]) - 1), 'hours').add(59, 'minutes'); // End at 6 PM (excluding the last 6 hours)
-      console.log("se->"+startTime+"---"+endTime);
+      // console.log("Selected channel->"+selectedChannel);
+      // console.log("se->"+startTime+"---"+endTime);
       let index = 0;
       let randomNumber = (Math.random() * (5 - 1) + 1);
     
@@ -259,12 +259,12 @@ let generateDynamicInternalSlots = async (compaign, singleSlot, connection, slot
         let newRandomNumber = (Math.random() * (4 - 1) + 1);
         currentSlot = currentSlot.add((newRandomNumber * 60 * 1000), 'milliseconds');
         endSlot = currentSlot.clone().add(slotDuration)
-        console.log("slot in loop::::" + currentSlot.format('HH:mm:ss'));
+        // console.log("slot in loop::::" + currentSlot.format('HH:mm:ss'));
       }
       
-      console.log("selected slot::===" + currentSlot.format('HH:mm:ss'));
+      // console.log("selected slot::===" + currentSlot.format('HH:mm:ss'));
       for (let slotIndex = 0; slotIndex < singleSlot.slotCount; slotIndex++) {
-        console.log("Selected slot index=--->"+slotIndex+" --- ");
+        // console.log("Selected slot index=--->"+slotIndex+" --- ");
         slotInsertValues.push(`('${currentSlot.format('HH:mm:ss')}', '${endSlot.format('HH:mm:ss')}', ${compaign.compaignId}, '${new Date(startDate).toISOString().slice(0, 19).replace('T', ' ')}', ${compaign.network}, '${selectedChannel}', ${compaign.slotDuration})`)
         index++;
         let loopRandomNumber = (Math.random() * (4 - 1) + 1);
@@ -273,14 +273,14 @@ let generateDynamicInternalSlots = async (compaign, singleSlot, connection, slot
           endSlot = currentSlot.clone().add(slotDuration)
           while (await fetchExistingSlots(compaign, startDate, connection, selectedChannel, currentSlot, endSlot)) {
             currentSlot = currentSlot.add((loopRandomNumber * 60 * 1000), 'milliseconds');
-            console.log("slot in loop::::" + currentSlot.format('HH:mm:ss'));
+            // console.log("slot in loop::::" + currentSlot.format('HH:mm:ss'));
           }
         } else {
           currentSlot = currentSlot.add(slotDuration - (gapDuration / 2));
           endSlot = currentSlot.clone().add(slotDuration)
           while (await fetchExistingSlots(compaign, startDate, connection, selectedChannel, currentSlot, endSlot)) {
             currentSlot = currentSlot.add((loopRandomNumber * 60 * 1000), 'milliseconds');
-            console.log("slot in loop::::" + currentSlot.format('HH:mm:ss'));
+            // console.log("slot in loop::::" + currentSlot.format('HH:mm:ss'));
           }
         }
       }
@@ -308,7 +308,7 @@ let generateSlotsDynamic = async (compaign, connection) => {
           singleSlot.compaignTime = ("08-12").split("-");
           let insertArray = await generateDynamicInternalSlots(compaign, singleSlot, connection, slotDuration);
           mainSlotData.push(insertArray);
-          console.log("i=0->"+JSON.stringify(mainSlotData));
+          // console.log("i=0->"+JSON.stringify(mainSlotData));
         }
         //for afternoon slots
         if(singleSlot.afternoonCount != 0){
@@ -316,7 +316,7 @@ let generateSlotsDynamic = async (compaign, connection) => {
           singleSlot.compaignTime = ("12-18").split("-");
           let insertArray = await generateDynamicInternalSlots(compaign, singleSlot, connection, slotDuration);
           mainSlotData.push(insertArray);
-          console.log("i=1->"+JSON.stringify(mainSlotData));
+          // console.log("i=1->"+JSON.stringify(mainSlotData));
         }
         //for evening slots
         if(singleSlot.eveningCount != 0){
@@ -324,15 +324,15 @@ let generateSlotsDynamic = async (compaign, connection) => {
           singleSlot.compaignTime = ("18-24").split("-");
           let insertArray = await generateDynamicInternalSlots(compaign, singleSlot, connection, slotDuration);
           mainSlotData.push(insertArray);
-          console.log("i=2->"+JSON.stringify(mainSlotData));
+          // console.log("i=2->"+JSON.stringify(mainSlotData));
         }
 
   
 
     
     };
-    console.log("Outside->"+JSON.stringify(mainSlotData));
-
+    // console.log("Outside->"+JSON.stringify(mainSlotData));
+    console.log(("output created"));
     return mainSlotData;
   } catch (error) {
     console.log(error);
@@ -427,6 +427,7 @@ router.post('/add', isLoggedIn, async function (req, res, next) {
         compaign.compaignId = compaignId[0][0].id;
 
         let slots = await generateSlotsDynamic(compaign, connection);
+        console.log("main output in route");
         let slotInsertQry = `INSERT INTO SLOTS (start_time, end_time, compaignId, date, network, channels, duration) values ${slots.join(',')}`
         let [slotResp] = await connection.query(slotInsertQry);
         
